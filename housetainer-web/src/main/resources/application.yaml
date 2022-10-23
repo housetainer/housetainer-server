@@ -37,3 +37,7 @@ webClient:
 logging:
   level:
     org.springframework.r2dbc.core: debug
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
