@@ -1,0 +1,16 @@
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>timestamp=%d{HH:mm:ss.SSS}, level=%-5level, traceId=%X{traceId}, logger=%logger{0}, tn=%t, message=%msg|%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <logger name="reactor.ipc.netty" level="DEBUG"/>
+    <logger name="org.apache.http" level="INFO"/>
+    <logger name="com.housetainer" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

@@ -1,0 +1,39 @@
+server:
+  port: 8423
+
+spring:
+  r2dbc:
+    url: r2dbc:mysql://localhost:3856/housetainer?serverTimezone=UTC&characterEncoding=UTF-8
+    username: admin
+    password: Admin123
+    pool:
+      max-size: 100
+      validation-query: SELECT 1
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    url: jdbc:mysql://localhost:3856/housetainer?serverTimezone=UTC&characterEncoding=UTF-8
+    user: admin
+    password: Admin123
+
+webClient:
+  defaultProperties:
+    connectionTimeout: 6000
+    readTimeout: 6000
+    writeTimeout: 9000
+    maxIdleTime: 10s
+    maxRetry: 2
+    retryDelay: 1s
+  services:
+    naver:
+      url: http://localhost:30001 # https://openapi.naver.com
+
+logging:
+  level:
+    org.springframework.r2dbc.core: debug

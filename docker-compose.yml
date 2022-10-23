@@ -1,0 +1,28 @@
+version: '3.3'
+services:
+  db-master:
+    image: mysql:8.0.31
+    platform: linux/amd64
+    command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "db-data:/var/lib/mysql"
+    ports:
+      - 3856:3306
+    networks:
+      dock_net:
+        ipv4_address: 172.16.0.10
+    environment:
+      MYSQL_DATABASE: "housetainer"
+      MYSQL_USER: "admin"
+      MYSQL_PASSWORD: "Admin123"
+      MYSQL_ROOT_PASSWORD: "Admin123"
+
+volumes:
+  db-data:
+
+networks:
+  dock_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.16.0.0/16
