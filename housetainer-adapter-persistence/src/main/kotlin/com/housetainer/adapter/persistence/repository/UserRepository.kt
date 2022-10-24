@@ -5,6 +5,7 @@ import com.housetainer.adapter.persistence.repository.r2dbc.UserR2DBCRepository
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.model.user.CreateUserRequest
 import com.housetainer.domain.persistence.user.CreateUserCommand
+import com.housetainer.domain.persistence.user.GetUserByEmailQuery
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
 import org.springframework.stereotype.Component
 
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component
 class UserRepository(
     val repository: UserR2DBCRepository
 ) : CreateUserCommand,
-    GetUserByIdQuery {
+    GetUserByIdQuery,
+    GetUserByEmailQuery {
 
     override suspend fun createUser(createUserRequest: CreateUserRequest): User {
         return repository.save(
@@ -38,6 +40,10 @@ class UserRepository(
 
     override suspend fun getUserById(userId: String): User? {
         return repository.findByUserId(userId)?.toUser()
+    }
+
+    override suspend fun getUserByEmail(email: String): User? {
+        return repository.findByEmail(email)?.toUser()
     }
 
     private fun UserEntity.toUser(): User = User(

@@ -378,3 +378,4 @@ dmypy.json
 cython_debug/
 
 *.sql
+*.mwb

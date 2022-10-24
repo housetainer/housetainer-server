@@ -32,7 +32,9 @@ class HousetainerRouter(
                     operationId = "signUp",
                     summary = "User sign-up",
                     requestBody = RequestBody(
-                        content = [Content(schema = Schema(implementation = SignUpRequest::class))]
+                        content = [
+                            Content(schema = Schema(implementation = SignUpRequest::class))
+                        ]
                     ),
                     responses = [
                         ApiResponse(

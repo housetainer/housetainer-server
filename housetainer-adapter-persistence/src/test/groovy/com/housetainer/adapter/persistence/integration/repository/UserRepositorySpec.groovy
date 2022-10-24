@@ -24,7 +24,7 @@ class UserRepositorySpec extends RepositorySpecification {
         given:
         def now = new Date()
         def request = new CreateUserRequest(
-            "test@test.com",
+            "$uuid@test.com",
             uuid,
             AuthProvider.NAVER,
             "name",
@@ -73,6 +73,17 @@ class UserRepositorySpec extends RepositorySpecification {
         when:
         def result = CoroutineTestUtils.executeSuspendFun {
             userRepository.getUserById(user.userId, it)
+        } as User
+
+        then:
+        result == user
+        0 * _
+    }
+
+    def "get user by email"() {
+        when:
+        def result = CoroutineTestUtils.executeSuspendFun {
+            userRepository.getUserByEmail(user.email, it)
         } as User
 
         then:
