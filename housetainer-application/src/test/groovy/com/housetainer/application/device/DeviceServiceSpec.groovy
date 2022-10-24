@@ -4,12 +4,12 @@ import com.housetainer.application.ApplicationSpecification
 import com.housetainer.domain.entity.device.Device
 import com.housetainer.domain.model.device.UpsertDeviceRequest
 import com.housetainer.domain.persistence.device.CreateDeviceCommand
-import com.housetainer.domain.persistence.device.GetDeviceQuery
+import com.housetainer.domain.persistence.device.GetDeviceByIdQuery
 import com.housetainer.domain.persistence.device.UpdateDeviceCommand
 
 class DeviceServiceSpec extends ApplicationSpecification {
 
-    GetDeviceQuery getDeviceQuery = Mock()
+    GetDeviceByIdQuery getDeviceQuery = Mock()
     CreateDeviceCommand createDeviceCommand = Mock()
     UpdateDeviceCommand updateDeviceCommand = Mock()
 
@@ -49,7 +49,7 @@ class DeviceServiceSpec extends ApplicationSpecification {
 
         then:
         result == device
-        1 * getDeviceQuery.getDevice(deviceId, _) >> null
+        1 * getDeviceQuery.getDeviceById(deviceId, _) >> null
         1 * createDeviceCommand.createDevice(request, _) >> device
         0 * _
     }
@@ -82,7 +82,7 @@ class DeviceServiceSpec extends ApplicationSpecification {
 
         then:
         result == device
-        1 * getDeviceQuery.getDevice(deviceId, _) >> device
+        1 * getDeviceQuery.getDeviceById(deviceId, _) >> device
         1 * updateDeviceCommand.updateDevice(request, _) >> device
         0 * _
     }

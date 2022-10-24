@@ -1,7 +1,9 @@
 package com.housetainer.adapter.persistence.integration.repository
 
-import com.housetainer.adapter.persistence.repository.FlywayConfig
+import com.housetainer.adapter.persistence.repository.DeviceRepository
 import com.housetainer.adapter.persistence.repository.UserRepository
+import com.housetainer.adapter.persistence.repository.flyway.FlywayConfig
+import com.housetainer.adapter.persistence.repository.r2dbc.DeviceR2DBCRepository
 import com.housetainer.adapter.persistence.repository.r2dbc.R2dbcConfig
 import com.housetainer.adapter.persistence.repository.r2dbc.UserR2DBCRepository
 import com.housetainer.common.BaseSpecification
@@ -12,10 +14,12 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories
 
 @SpringBootTest(classes = [
+    FlywayConfig,
     R2dbcConfig,
     UserR2DBCRepository,
     UserRepository,
-    FlywayConfig
+    DeviceR2DBCRepository,
+    DeviceRepository
 ])
 @AutoConfigureDataR2dbc
 @AutoConfigureTestEntityManager

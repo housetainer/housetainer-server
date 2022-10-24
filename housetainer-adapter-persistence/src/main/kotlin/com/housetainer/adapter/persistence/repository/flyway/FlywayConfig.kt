@@ -1,4 +1,4 @@
-package com.housetainer.adapter.persistence.repository
+package com.housetainer.adapter.persistence.repository.flyway
 
 import org.flywaydb.core.Flyway
 import org.springframework.context.annotation.Bean

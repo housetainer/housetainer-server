@@ -2,7 +2,7 @@ package com.housetainer.domain.persistence.device
 
 import com.housetainer.domain.entity.device.Device
 
-interface GetDeviceQuery {
+interface GetDeviceByIdQuery {
 
-    suspend fun getDevice(deviceId: String): Device?
+    suspend fun getDeviceById(deviceId: String): Device?
 }

@@ -2,7 +2,7 @@ package com.housetainer.domain.entity.exception
 
 open class BaseException(
     val code: Int,
-    override var message: String?
+    override var message: String? = null
 ) : RuntimeException(message) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
