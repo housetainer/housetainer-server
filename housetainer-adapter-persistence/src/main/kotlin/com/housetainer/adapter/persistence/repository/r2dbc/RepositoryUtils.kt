@@ -10,7 +10,7 @@ object RepositoryUtils {
     val log = logger()
 
     // https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-reference-error-sqlstates.html
-    inline fun <reified T, reified U : CoroutineCrudRepository<T, Int>> U.execute(block: (U) -> T): T {
+    inline fun <reified T, reified U : CoroutineCrudRepository<T, Long>> U.execute(block: (U) -> T): T {
         return runCatching {
             block(this)
         }.onFailure {

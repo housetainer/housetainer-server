@@ -32,7 +32,7 @@ class DeviceRepositorySpec extends RepositorySpecification {
     @Autowired
     UserRepository userRepository
 
-    def "create device"() {
+    def "create a device"() {
         given:
         user = CoroutineTestUtils.executeSuspendFun {
             userRepository.createUser(createUserRequest, it)
@@ -69,6 +69,28 @@ class DeviceRepositorySpec extends RepositorySpecification {
         then:
         result == device
         0 * _
+    }
+
+    def "update a device"() {
+        given:
+        def updateDeviceRequest = new UpsertDeviceRequest(device.deviceId, user.userId).with(true) {
+            appVersion = "1.0.1"
+        } as UpsertDeviceRequest
+
+        when:
+        def result = CoroutineTestUtils.executeSuspendFun {
+            deviceRepository.updateDevice(updateDeviceRequest, it)
+        } as Device
+
+        then:
+        result != null
+        result.deviceId == updateDeviceRequest.deviceId
+        result.platform == device.platform
+        result.appVersion == updateDeviceRequest.appVersion
+        0 * _
+
+        cleanup:
+        device = result
     }
 
     def "create device but user not exist"() {

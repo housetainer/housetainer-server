@@ -5,10 +5,10 @@ import com.housetainer.domain.entity.user.User
 data class Device(
     val deviceId: String,
     val user: User,
-    val platform: String,
-    val platformVersion: String,
-    val appVersion: String,
-    val locale: String,
+    var platform: String?,
+    var platformVersion: String?,
+    var appVersion: String?,
+    var locale: String?,
     val createTime: Long,
     val updateTime: Long
 )

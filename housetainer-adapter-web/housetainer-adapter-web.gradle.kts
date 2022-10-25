@@ -18,6 +18,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
     runtimeOnly("org.springdoc:springdoc-openapi-kotlin:1.6.12")
+    implementation("org.springdoc:springdoc-openapi-common:1.6.12")
     implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.12")
 
     // Test

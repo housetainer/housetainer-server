@@ -32,9 +32,9 @@ dependencies {
 
     // Database
     implementation("org.springframework.boot:spring-boot-starter-data-r2dbc")
-    implementation("com.github.jasync-sql:jasync-r2dbc-mysql:2.1.7")
+    implementation("com.github.jasync-sql:jasync-r2dbc-mysql:2.0.7")
     implementation("mysql:mysql-connector-java:8.0.30")
-    implementation("org.flywaydb:flyway-mysql:$flywayVersion")
+    implementation("org.flywaydb:flyway-core:$flywayVersion")
 
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))

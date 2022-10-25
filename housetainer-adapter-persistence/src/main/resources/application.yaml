@@ -30,3 +30,9 @@ webClient:
   services:
     naver:
       url: http://localhost:30001 # https://openapi.naver.com
+
+logging:
+  level:
+    org.springframework.r2dbc.core: debug
+    org.springframework.data.r2dbc: DEBUG
+    io.r2dbc: DEBUG

@@ -9,6 +9,7 @@ import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.model.device.UpsertDeviceRequest
 import com.housetainer.domain.persistence.device.CreateDeviceCommand
 import com.housetainer.domain.persistence.device.GetDeviceByIdQuery
+import com.housetainer.domain.persistence.device.UpdateDeviceCommand
 import org.springframework.stereotype.Component
 import java.time.Instant
 
@@ -16,27 +17,36 @@ import java.time.Instant
 class DeviceRepository(
     private val repository: DeviceR2DBCRepository,
     private val userRepository: UserRepository
-) : CreateDeviceCommand, GetDeviceByIdQuery {
+) : CreateDeviceCommand, GetDeviceByIdQuery, UpdateDeviceCommand {
 
     override suspend fun createDevice(upsertDeviceRequest: UpsertDeviceRequest): Device {
-        val savedDevice: DeviceEntity? = repository.findByDeviceId(upsertDeviceRequest.deviceId)
+        return upsertDevice(upsertDeviceRequest)
+    }
+
+    override suspend fun updateDevice(upsertDeviceRequest: UpsertDeviceRequest): Device {
+        return upsertDevice(upsertDeviceRequest, repository.findByDeviceId(upsertDeviceRequest.deviceId))
+    }
+
+    private suspend fun upsertDevice(
+        upsertDeviceRequest: UpsertDeviceRequest,
+        savedDevice: DeviceEntity? = null
+    ): Device {
         val now = Instant.now().toEpochMilli()
 
-        return repository.execute {
-            it.save(
-                DeviceEntity(
-                    id = savedDevice?.id,
-                    deviceId = upsertDeviceRequest.deviceId,
-                    userId = upsertDeviceRequest.userId,
-                    platform = upsertDeviceRequest.platform,
-                    platformVersion = upsertDeviceRequest.platformVersion,
-                    appVersion = upsertDeviceRequest.appVersion,
-                    locale = upsertDeviceRequest.locale,
-                    createTime = savedDevice?.createTime ?: now,
-                    updateTime = now,
-                )
+        val device: DeviceEntity = savedDevice
+            ?: DeviceEntity(
+                deviceId = upsertDeviceRequest.deviceId,
+                userId = upsertDeviceRequest.userId,
+                createTime = now,
+                updateTime = now,
             )
-        }.toDevice()
+
+        device.platform = upsertDeviceRequest.platform ?: device.platform
+        device.platformVersion = upsertDeviceRequest.platformVersion ?: device.platformVersion
+        device.appVersion = upsertDeviceRequest.appVersion ?: device.appVersion
+        device.locale = upsertDeviceRequest.locale ?: device.locale
+
+        return repository.execute { it.save(device) }.toDevice()
     }
 
     override suspend fun getDeviceById(deviceId: String): Device? {

@@ -7,9 +7,9 @@ import com.housetainer.domain.entity.user.UserType
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
-@Table(name = "users")
+@Table("users")
 class UserEntity @JvmOverloads constructor(
-    @Id var id: Int? = null,
+    @Id var id: Long? = null,
     val userId: String = CommonUtils.randomUuid,
     val email: String,
     val authId: String,

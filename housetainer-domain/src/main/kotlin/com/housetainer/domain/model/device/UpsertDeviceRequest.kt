@@ -1,10 +1,10 @@
 package com.housetainer.domain.model.device
 
-data class UpsertDeviceRequest(
+data class UpsertDeviceRequest @JvmOverloads constructor(
     val deviceId: String,
     val userId: String,
-    val platform: String,
-    val platformVersion: String,
-    val appVersion: String,
-    val locale: String
+    var platform: String? = null,
+    var platformVersion: String? = null,
+    var appVersion: String? = null,
+    var locale: String? = null
 )

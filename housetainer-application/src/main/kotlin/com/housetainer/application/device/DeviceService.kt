@@ -11,7 +11,7 @@ import com.housetainer.domain.usecase.device.UpsertDeviceUseCase
 class DeviceService(
     private val getDeviceByIdQuery: GetDeviceByIdQuery,
     private val createDeviceCommand: CreateDeviceCommand,
-    private val updateDeviceCommand: UpdateDeviceCommand,
+    private val updateDeviceCommand: UpdateDeviceCommand
 ) : UpsertDeviceUseCase {
 
     private val log = logger()
