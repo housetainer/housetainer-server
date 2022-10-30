@@ -18,5 +18,4 @@ class DeviceModule {
     ) = DeviceService(
         getDeviceByIdQuery, createDeviceCommand, updateDeviceCommand
     )
-
 }

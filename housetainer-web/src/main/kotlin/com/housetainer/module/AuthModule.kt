@@ -20,5 +20,4 @@ class AuthModule {
     ) = SignService(
         getUserProfileFromNaverQuery, getUserByEmailQuery, createUserUseCase, upsertDeviceUseCase
     )
-
 }

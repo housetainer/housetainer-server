@@ -378,4 +378,5 @@ dmypy.json
 cython_debug/
 
 *.sql
-*.mwb
+**/*.mwb
+**/server-application.yaml

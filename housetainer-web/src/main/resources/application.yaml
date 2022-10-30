@@ -21,6 +21,7 @@ spring:
     url: jdbc:mysql://localhost:3856/housetainer?serverTimezone=UTC&characterEncoding=UTF-8
     user: admin
     password: Admin123
+    locations: classpath:db/migration
 
 webClient:
   defaultProperties:
@@ -40,4 +41,4 @@ logging:
 
 springdoc:
   swagger-ui:
-    path: /swagger-ui.html
+    path: /housetainer-swagger.html
