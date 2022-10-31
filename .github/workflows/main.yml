@@ -29,3 +29,22 @@ jobs:
       - name: Check
         run: |
           ls housetainer-web/build/libs
+
+      - name: Make zip file
+        run: zip -qq -r ./$GITHUB_SHA.zip .
+        shell: bash
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3 #3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://housetainer/housetainer-jar/$GITHUB_SHA.zip
+
+      - name: Code Deploy #4
+        run: aws deploy create-deployment --application-name housetainer
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name production
+          --s3-location bucket=housetainer/housetainer-jar,bundleType=zip,key=$GITHUB_SHA.zip
