@@ -21,6 +21,9 @@ pluginManagement {
         id("org.jetbrains.kotlinx.kover") version koverVersion
         id("io.gitlab.arturbosch.detekt") version detektVersion
 
+        id("com.github.ben-manes.versions") version "0.39.0"
+        id("nebula.release") version "16.0.0"
+
         kotlin("jvm") version kotlinVersion
         kotlin("kapt") version kotlinVersion
         kotlin("plugin.spring") version kotlinVersion
