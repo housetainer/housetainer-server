@@ -6,6 +6,9 @@ plugins {
     kotlin("jvm")
     id("org.jmailen.kotlinter")
     id("io.gitlab.arturbosch.detekt")
+
+    id("com.github.ben-manes.versions")
+    id("nebula.release")
 }
 
 val jvmEncoding: String = Charset.defaultCharset().name()
@@ -46,6 +49,8 @@ allprojects {
 
 subprojects {
     apply(plugin = "maven-publish")
+    apply(plugin = "com.github.ben-manes.versions")
+    apply(plugin = "nebula.release")
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jmailen.kotlinter")
 
