@@ -23,16 +23,26 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: .*
           tag_prefix: ''
+
       - name: Build
         run: |
           ./gradlew clean build -x test --parallel -Prelease.version=${{ steps.new_version.outputs.new_tag }}-SNAPSHOT
-      - name: Check
+      - name: Check build result
         run: |
           ls housetainer-web/build/libs
 
       - name: Make zip file
-        run: zip -qq -r ./$GITHUB_SHA.zip .
         shell: bash
+        run: |
+          mkdir deploy
+          cp appspec-beta.yml deploy/appspec.yml
+          cp deploy-beta.sh deploy/deploy.sh
+          cp housetainer-web/build/libs/housetainer-web-*.jar deploy/
+          cd deploy
+          zip -qq -r ./$GITHUB_SHA.zip .
+          mv ./$GITHUB_SHA.zip ../
+          cd ../
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -46,5 +56,5 @@ jobs:
       - name: Code Deploy #4
         run: aws deploy create-deployment --application-name housetainer
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name production
-          --s3-location bucket=housetainer/housetainer-jar,bundleType=zip,key=$GITHUB_SHA.zip
+          --deployment-group-name beta
+          --s3-location bucket=housetainer,bundleType=zip,key=housetainer-jar/$GITHUB_SHA.zip

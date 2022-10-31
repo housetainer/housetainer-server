@@ -3,8 +3,6 @@ name: Deploy to prod
 on:
   push:
     branches: [ release ]
-  pull_request:
-    branches: [ release ]
 
 jobs:
   build:
@@ -25,10 +23,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           release_branches: .*
           tag_prefix: ''
+
       - name: Build
         run: |
-          ./gradlew clean build -x test --parallel -Prelease.version=${{ steps.new_version.outputs.new_tag }}
-      - name: Check
+          ./gradlew clean build -x test --parallel -Prelease.version=${{ steps.new_version.outputs.new_tag }}-SNAPSHOT
+      - name: Check build result
         run: |
           ls housetainer-web/build/libs
       - name: Create a GitHub release
@@ -38,3 +37,31 @@ jobs:
           name: Release ${{ steps.new_version.outputs.new_tag }}
           body: ${{ steps.new_version.outputs.changelog }}
           generateReleaseNotes: true
+
+      - name: Make zip file
+        shell: bash
+        run: |
+          mkdir deploy
+          cp appspec.yml deploy/appspec.yml
+          cp deploy.sh deploy/deploy.sh
+          cp housetainer-web/build/libs/housetainer-web-*.jar deploy/
+          cd deploy
+          zip -qq -r ./$GITHUB_SHA.zip .
+          mv ./$GITHUB_SHA.zip ../
+          cd ../
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Upload to S3 #3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.zip s3://housetainer/housetainer-jar/$GITHUB_SHA.zip
+
+      - name: Code Deploy #4
+        run: aws deploy create-deployment --application-name housetainer
+          --deployment-config-name CodeDeployDefault.OneAtATime
+          --deployment-group-name production
+          --s3-location bucket=housetainer,bundleType=zip,key=housetainer-jar/$GITHUB_SHA.zip
