@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  pr_check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,17 +20,16 @@ jobs:
       - name: Check lint
         run: |
           ./gradlew lintKotlin detektAll --parallel
-      - uses: pooi/detekt-comment@main
-        if: always()
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          xml-detekt-report-path: build/reports/detekt/detekt.xml
-          html-detekt-report-path: build/reports/detekt/detekt.html
+      #      - uses: pooi/detekt-comment@main
+      #        if: always()
+      #        with:
+      #          github-token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+      #          xml-detekt-report-path: build/reports/detekt/detekt.xml
+      #          html-detekt-report-path: build/reports/detekt/detekt.html
       - name: Test
         run: |
           ./gradlew check -x housetainer-adapter-persistence:check --parallel
-            - uses: pooi/coverage-comment@main
-        if: steps.check-main-code-changed.outputs.changed == 'true'
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          xml-test-report-path: housetainer-web/build/reports/kover/report.xml,housetainer-application/build/reports/kover/report.xml,housetainer-adapter-web/build/reports/kover/report.xml
+#      - uses: pooi/coverage-comment@main
+#        with:
+#          github-token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
+#          xml-test-report-path: housetainer-web/build/reports/kover/report.xml,housetainer-application/build/reports/kover/report.xml,housetainer-adapter-web/build/reports/kover/report.xml
