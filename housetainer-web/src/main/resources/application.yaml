@@ -45,5 +45,9 @@ logging:
     org.springframework.r2dbc.core: debug
 
 springdoc:
+  api-docs:
+    enabled: false
+
   swagger-ui:
+    url: /swagger.yaml
     path: /housetainer-swagger.html

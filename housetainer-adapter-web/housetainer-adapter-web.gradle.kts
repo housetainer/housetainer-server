@@ -17,10 +17,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webflux")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
-    runtimeOnly("org.springdoc:springdoc-openapi-kotlin:1.6.12")
-    implementation("org.springdoc:springdoc-openapi-common:1.6.12")
-    implementation("org.springdoc:springdoc-openapi-webflux-ui:1.6.12")
-
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
