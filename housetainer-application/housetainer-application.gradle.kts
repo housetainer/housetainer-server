@@ -10,7 +10,6 @@ dependencies {
     implementation(project(":housetainer-domain"))
 
     implementation("org.glassfish.jaxb:jaxb-runtime:2.3.2")
-    implementation("io.jsonwebtoken:jjwt:0.9.1")
 
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))

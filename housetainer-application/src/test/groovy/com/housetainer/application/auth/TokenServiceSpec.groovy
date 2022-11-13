@@ -3,7 +3,8 @@ package com.housetainer.application.auth
 import com.housetainer.application.ApplicationSpecification
 import com.housetainer.domain.entity.auth.AuthProvider
 import com.housetainer.domain.entity.exception.BaseException
-import com.housetainer.domain.model.auth.IssueTokenRequest
+import com.housetainer.domain.model.auth.InternalIssueTokenRequest
+import com.housetainer.domain.port.token.TokenService
 import spock.lang.Shared
 
 import java.time.Duration
@@ -19,7 +20,7 @@ class TokenServiceSpec extends ApplicationSpecification {
     TokenService tokenService
 
     def setup() {
-        tokenService = new TokenService(secretKey, timeout)
+        tokenService = TokenService.INSTANCE.getInstance(secretKey, timeout)
     }
 
     def "issue and validate token"() {
@@ -27,7 +28,7 @@ class TokenServiceSpec extends ApplicationSpecification {
         def userId = uuid
         def authId = uuid
         def authProvider = AuthProvider.NAVER
-        def request = new IssueTokenRequest(userId, authId, authProvider)
+        def request = new InternalIssueTokenRequest(userId, authId, authProvider)
 
         when:
         def token = tokenService.issueToken(request)
@@ -52,7 +53,7 @@ class TokenServiceSpec extends ApplicationSpecification {
         def userId = uuid
         def authId = uuid
         def authProvider = AuthProvider.NAVER
-        def request = new IssueTokenRequest(userId, authId, authProvider)
+        def request = new InternalIssueTokenRequest(userId, authId, authProvider)
 
         when:
         def token = tokenService.issueToken(request)

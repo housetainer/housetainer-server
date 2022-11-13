@@ -1,10 +1,13 @@
 package com.housetainer.adapter.web.router
 
 import com.housetainer.adapter.web.handler.SignHandler
+import com.housetainer.common.utils.Constants
 import com.housetainer.domain.entity.user.User
-import com.housetainer.domain.model.auth.SignInRequest
+import com.housetainer.domain.model.auth.RenewTokenRequest
 import com.housetainer.domain.model.auth.SignUpRequest
+import com.housetainer.domain.model.user.UserResponse
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.headers.Header
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.parameters.RequestBody
@@ -36,7 +39,8 @@ class SignRouter {
                     responses = [
                         ApiResponse(
                             responseCode = "200",
-                            content = [Content(schema = Schema(implementation = User::class))]
+                            headers = [Header(name = Constants.HOUSETAINER_TOKEN_HEADER, required = true)],
+                            content = [Content(schema = Schema(implementation = UserResponse::class))]
                         ),
                         ApiResponse(
                             responseCode = "400"
@@ -53,12 +57,12 @@ class SignRouter {
             RouterOperation(
                 path = "/sign/in",
                 method = [RequestMethod.POST],
+                headers = [
+                    "Authorization"
+                ],
                 operation = Operation(
                     operationId = "signIn",
                     summary = "User sign in",
-                    requestBody = RequestBody(
-                        content = [Content(schema = Schema(implementation = SignInRequest::class))]
-                    ),
                     responses = [
                         ApiResponse(
                             responseCode = "200",
@@ -75,6 +79,34 @@ class SignRouter {
                         )
                     ]
                 )
+            ),
+            RouterOperation(
+                path = "/sign/token/renew",
+                method = [RequestMethod.POST],
+                operation = Operation(
+                    operationId = "renewToken",
+                    summary = "User token re-issue",
+                    requestBody = RequestBody(
+                        content = [
+                            Content(schema = Schema(implementation = RenewTokenRequest::class))
+                        ]
+                    ),
+                    responses = [
+                        ApiResponse(
+                            responseCode = "204",
+                            headers = [Header(name = Constants.HOUSETAINER_TOKEN_HEADER, required = true)]
+                        ),
+                        ApiResponse(
+                            responseCode = "400"
+                        ),
+                        ApiResponse(
+                            responseCode = "401"
+                        ),
+                        ApiResponse(
+                            responseCode = "403"
+                        ),
+                    ]
+                )
             )
         ]
     )
@@ -82,6 +114,7 @@ class SignRouter {
         "/sign".nest {
             POST("/up", signHandler::signUp)
             POST("/in", signHandler::signIn)
+            POST("/token/renew", signHandler::renewToken)
         }
     }
 }

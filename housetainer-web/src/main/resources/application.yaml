@@ -23,6 +23,11 @@ spring:
     password: Admin123
     locations: classpath:db/migration
 
+auth:
+  userToken:
+    secretKey: PLACEHOLDER
+    timeout: 7d
+
 webClient:
   defaultProperties:
     connectionTimeout: 6000
