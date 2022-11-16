@@ -1,0 +1,264 @@
+openapi: 3.0.3
+
+info:
+  title: Housetainer API Spec
+  version: 1.0.0
+
+servers:
+  - url: https://beta.housetainer.tk
+  - url: https://housetainer.tk
+
+tags:
+  - name: sign
+    description: User Sign Up or In
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  /sign/up:
+    post:
+      tags:
+        - sign
+      summary: Sign Up
+      description: User sign up
+      operationId: signUp
+      requestBody:
+        description: Sign up request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignUpRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            X-HOUSETAINER-TOKEN:
+              schema:
+                type: string
+              description: Housetainer user token
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /sign/in:
+    post:
+      tags:
+        - sign
+      summary: Sign In
+      description: User sign in with **user token**
+      operationId: signIn
+      security:
+        - bearerAuth: [ "*" ]
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /sign/token/renew:
+    post:
+      tags:
+        - sign
+      summary: Re-issue token
+      description: Re-issue token
+      operationId: tokenRenew
+      requestBody:
+        description: Re-issue token request (userId or email is required)
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RenewTokenRequest'
+        required: true
+      responses:
+        '204':
+          description: Successful operation
+          headers:
+            X-HOUSETAINER-TOKEN:
+              schema:
+                type: string
+              description: Housetainer user token
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  schemas:
+    AuthProvider:
+      type: string
+      enum:
+        - NAVER
+        - GOOGLE
+        - APPLE
+    UserStatus:
+      type: string
+      enum:
+        - ACTIVE
+        - INACTIVE
+    UserType:
+      type: string
+      enum:
+        - GUEST
+        - MEMBER
+        - HOUSETAINER
+    SignUpRequest:
+      type: object
+      required:
+        - email
+        - authId
+        - authProvider
+        - name
+      properties:
+        email:
+          type: string
+        authId:
+          type: string
+        authProvider:
+          $ref: '#/components/schemas/AuthProvider'
+        name:
+          type: string
+        nickname:
+          type: string
+        gender:
+          type: string
+        birthday:
+          type: string
+        phoneNumber:
+          type: string
+        profileImage:
+          type: string
+        countryCode:
+          type: string
+        languageCode:
+          type: string
+
+    UserResponse:
+      required:
+        - userId
+        - type
+        - status
+        - createTime
+        - updateTime
+      allOf:
+        - $ref: '#/components/schemas/SignUpRequest'
+        - type: object
+          properties:
+            userId:
+              type: string
+            type:
+              $ref: '#/components/schemas/UserType'
+            status:
+              $ref: '#/components/schemas/UserStatus'
+            createTime:
+              type: integer
+              format: int64
+              description: user create time (ms)
+            updateTime:
+              type: integer
+              format: int64
+              description: update time (ms)
+
+    RenewTokenRequest:
+      type: object
+      required:
+        - authId
+        - authProvider
+      description: userId or email is required
+      properties:
+        email:
+          type: string
+        userId:
+          type: string
+        authId:
+          type: string
+        authProvider:
+          $ref: '#/components/schemas/AuthProvider'
+
+    ErrorResponse:
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    BadRequest:
+      description: Bad request error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            objectExample:
+              value:
+                requestId: ff20bb17-7947-4161-ba78-f49a9c80868b
+                code: 400
+                message: Bad request
+    Unauthorized:
+      description: Unauthorized error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            objectExample:
+              value:
+                requestId: ff20bb17-7947-4161-ba78-f49a9c80868b
+                code: 401
+                message: Unauthorized
+    Forbidden:
+      description: Forbidden error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            objectExample:
+              value:
+                requestId: ff20bb17-7947-4161-ba78-f49a9c80868b
+                code: 403
+                message: Forbidden
+    NotFound:
+      description: NotFound error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            objectExample:
+              value:
+                requestId: ff20bb17-7947-4161-ba78-f49a9c80868b
+                code: 404
+                message: NotFound

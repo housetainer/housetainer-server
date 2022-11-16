@@ -6,41 +6,49 @@ import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.entity.user.UserStatus
 import com.housetainer.domain.entity.user.UserType
-import com.housetainer.domain.model.auth.SignInRequest
+import com.housetainer.domain.model.auth.InternalIssueTokenRequest
+import com.housetainer.domain.model.auth.InternalSignUpResult
+import com.housetainer.domain.model.auth.RenewTokenRequest
 import com.housetainer.domain.model.auth.SignUpRequest
-import com.housetainer.domain.model.auth.UserProfileResponse
-import com.housetainer.domain.model.device.UpsertDeviceRequest
 import com.housetainer.domain.model.user.CreateUserRequest
-import com.housetainer.domain.persistence.auth.GetUserProfileFromNaverQuery
+import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.persistence.user.GetUserByEmailQuery
-import com.housetainer.domain.usecase.device.UpsertDeviceUseCase
+import com.housetainer.domain.persistence.user.GetUserByIdQuery
+import com.housetainer.domain.port.token.TokenService
 import com.housetainer.domain.usecase.user.CreateUserUseCase
+import spock.lang.Shared
+import spock.lang.Unroll
+
+import java.time.Duration
 
 class SignServiceSpec extends ApplicationSpecification {
 
-    GetUserProfileFromNaverQuery getUserProfileFromNaverQuery = Mock()
+    @Shared
+    String secretKey = uuid
+
+    @Shared
+    Duration timeout = Duration.ofSeconds(3)
+
+    GetUserByIdQuery getUserByIdQuery = Mock()
     GetUserByEmailQuery getUserByEmailQuery = Mock()
     CreateUserUseCase createUserUseCase = Mock()
-    UpsertDeviceUseCase upsertDeviceUseCase = Mock()
 
-    SignService service
+    SignService sut
 
     def setup() {
-        service = new SignService(
-            getUserProfileFromNaverQuery,
+        sut = new SignService(
+            getUserByIdQuery,
             getUserByEmailQuery,
             createUserUseCase,
-            upsertDeviceUseCase
+            secretKey,
+            timeout
         )
     }
 
     def "sign up"() {
         given:
-        def accessToken = uuid
         def authId = uuid
-        def deviceId = uuid
         def request = new SignUpRequest(
-            accessToken,
             "test@test.com",
             authId,
             AuthProvider.NAVER,
@@ -51,12 +59,7 @@ class SignServiceSpec extends ApplicationSpecification {
             "010-0000-0000",
             null,
             null,
-            null,
-            deviceId,
-            "Android",
-            "12",
-            "1.0",
-            "ko_kr"
+            null
         )
         def user = new User(
             uuid,
@@ -76,23 +79,13 @@ class SignServiceSpec extends ApplicationSpecification {
             System.currentTimeMillis(),
             System.currentTimeMillis()
         )
-        def userProfileResponse = new UserProfileResponse(
-            request.authId,
-            request.email,
-            request.name,
-            request.nickname,
-            request.gender,
-            request.birthday,
-            request.profileImage,
-            request.phoneNumber
-        )
 
         when:
-        def result = service.signUp(request, coroutineContext) as User
+        def result = sut.signUp(request, coroutineContext) as InternalSignUpResult
 
         then:
-        result == user
-        1 * getUserProfileFromNaverQuery.getUserProfile(accessToken, _) >> userProfileResponse
+        compareUser(user, result.user)
+        result.token != null
         1 * getUserByEmailQuery.getUserByEmail(request.email, _) >> null
         1 * createUserUseCase.createUser({ CreateUserRequest it ->
             it.createTime > 0
@@ -101,69 +94,13 @@ class SignServiceSpec extends ApplicationSpecification {
             it.type == UserType.MEMBER
             it.status == UserStatus.ACTIVE
         }, _) >> user
-        1 * upsertDeviceUseCase.upsertDevice({ UpsertDeviceRequest it ->
-            it.deviceId == request.deviceId
-            it.userId == user.userId
-            it.platform == request.platform
-            it.platformVersion == request.platformVersion
-            it.appVersion == request.appVersion
-            it.locale == request.locale
-        }, _)
-        0 * _
-    }
-
-    def "sign up but invalid token"() {
-        given:
-        def accessToken = uuid
-        def authId = uuid
-        def deviceId = uuid
-        def request = new SignUpRequest(
-            accessToken,
-            "test@test.com",
-            authId,
-            AuthProvider.NAVER,
-            "name",
-            "nickname",
-            "M",
-            "2020-01-01",
-            "010-0000-0000",
-            null,
-            null,
-            null,
-            deviceId,
-            "Android",
-            "12",
-            "1.0",
-            "ko_kr"
-        )
-        def userProfileResponse = new UserProfileResponse(
-            uuid,
-            request.email,
-            request.name,
-            request.nickname,
-            request.gender,
-            request.birthday,
-            request.profileImage,
-            request.phoneNumber
-        )
-
-        when:
-        service.signUp(request, coroutineContext) as User
-
-        then:
-        def exception = thrown(BaseException)
-        exception == SignService.userUnauthorizedException()
-        1 * getUserProfileFromNaverQuery.getUserProfile(accessToken, _) >> userProfileResponse
         0 * _
     }
 
     def "sign up but duplicated"() {
         given:
-        def accessToken = uuid
         def authId = uuid
-        def deviceId = uuid
         def request = new SignUpRequest(
-            accessToken,
             "test@test.com",
             authId,
             AuthProvider.NAVER,
@@ -174,12 +111,7 @@ class SignServiceSpec extends ApplicationSpecification {
             "010-0000-0000",
             null,
             null,
-            null,
-            deviceId,
-            "Android",
-            "12",
-            "1.0",
-            "ko_kr"
+            null
         )
         def user = new User(
             uuid,
@@ -199,49 +131,28 @@ class SignServiceSpec extends ApplicationSpecification {
             System.currentTimeMillis(),
             System.currentTimeMillis()
         )
-        def userProfileResponse = new UserProfileResponse(
-            request.authId,
-            request.email,
-            request.name,
-            request.nickname,
-            request.gender,
-            request.birthday,
-            request.profileImage,
-            request.phoneNumber
-        )
 
         when:
-        def result = service.signUp(request, coroutineContext) as User
+        def result = sut.signUp(request, coroutineContext) as InternalSignUpResult
 
         then:
-        result == user
-        1 * getUserProfileFromNaverQuery.getUserProfile(accessToken, _) >> userProfileResponse
+        compareUser(user, result.user)
         1 * getUserByEmailQuery.getUserByEmail(request.email, _) >> user
-        1 * upsertDeviceUseCase.upsertDevice({ UpsertDeviceRequest it ->
-            it.deviceId == request.deviceId
-            it.userId == user.userId
-            it.platform == request.platform
-            it.platformVersion == request.platformVersion
-            it.appVersion == request.appVersion
-            it.locale == request.locale
-        }, _)
         0 * _
     }
 
     def "sign in"() {
-        def accessToken = uuid
+        given:
         def authId = uuid
         def userId = uuid
-        def request = new SignInRequest(
-            accessToken,
-            AuthProvider.NAVER,
-            userId
-        )
+        def token = TokenService.INSTANCE.issueToken(new InternalIssueTokenRequest(
+            userId, authId, AuthProvider.NAVER
+        ))
         def user = new User(
-            uuid,
+            userId,
             "test@test.com",
             authId,
-            request.authProvider,
+            AuthProvider.NAVER,
             "name",
             "nickname",
             "M",
@@ -255,54 +166,113 @@ class SignServiceSpec extends ApplicationSpecification {
             System.currentTimeMillis(),
             System.currentTimeMillis()
         )
-        def userProfileResponse = new UserProfileResponse(
-            user.authId,
-            user.email,
-            user.name,
-            user.nickname,
-            user.gender,
-            user.birthday,
-            user.profileImage,
-            user.phoneNumber
-        )
 
         when:
-        def result = service.signIn(request, coroutineContext) as User
+        def result = sut.signIn(token, coroutineContext) as UserResponse
 
         then:
-        result == user
-        1 * getUserProfileFromNaverQuery.getUserProfile(accessToken, _) >> userProfileResponse
-        1 * getUserByEmailQuery.getUserByEmail(user.email, _) >> user
+        compareUser(user, result)
+        1 * getUserByIdQuery.getUserById(userId, _) >> user
         0 * _
     }
 
     def "sign in but user not found"() {
-        def accessToken = uuid
+        given:
         def userId = uuid
-        def request = new SignInRequest(
-            accessToken,
-            AuthProvider.NAVER,
-            userId
-        )
-        def userProfileResponse = new UserProfileResponse(
-            uuid,
-            "test@test.com",
-            "name",
-            null,
-            null,
-            null,
-            null,
-            null
-        )
+        def authId = uuid
+        def token = TokenService.INSTANCE.issueToken(new InternalIssueTokenRequest(
+            userId, authId, AuthProvider.NAVER
+        ))
 
         when:
-        service.signIn(request, coroutineContext) as User
+        sut.signIn(token, coroutineContext)
 
         then:
         def exception = thrown(BaseException)
         exception == SignService.userNotFoundException()
-        1 * getUserProfileFromNaverQuery.getUserProfile(accessToken, _) >> userProfileResponse
-        1 * getUserByEmailQuery.getUserByEmail("test@test.com", _) >> null
+        1 * getUserByIdQuery.getUserById(userId, _) >> null
         0 * _
+    }
+
+    @Unroll
+    def "renew token"() {
+        given:
+        def user = createUser()
+        def request = new RenewTokenRequest(
+            email,
+            userId,
+            uuid,
+            AuthProvider.NAVER
+        )
+
+        when:
+        def result = sut.renewToken(request, coroutineContext) as String
+
+        then:
+        result != null
+        (email == null ? 0 : 1) * getUserByEmailQuery.getUserByEmail(email, _) >> user
+        (userId == null ? 0 : 1) * getUserByIdQuery.getUserById(userId, _) >> user
+        0 * _
+
+        where:
+        email           | userId
+        null            | uuid
+        "test@test.com" | null
+    }
+
+    def "renew token but userId and email are empty"() {
+        given:
+        def request = new RenewTokenRequest(
+            null,
+            null,
+            uuid,
+            AuthProvider.NAVER
+        )
+
+        when:
+        sut.renewToken(request, coroutineContext)
+
+        then:
+        def exception = thrown(BaseException)
+        exception.message == SignService.userIdOrEmailRequiredException().message
+        0 * _
+    }
+
+    def "renew token but user not found"() {
+        given:
+        def request = new RenewTokenRequest(
+            null,
+            uuid,
+            uuid,
+            AuthProvider.NAVER
+        )
+
+        when:
+        sut.renewToken(request, coroutineContext)
+
+        then:
+        def exception = thrown(BaseException)
+        exception.message == SignService.userNotFoundException().message
+        1 * getUserByIdQuery.getUserById(request.userId, _) >> null
+        0 * _
+    }
+
+    def compareUser(User user, UserResponse userResponse) {
+        return user.userId == userResponse.userId &&
+            user.email == userResponse.email &&
+            user.authId == userResponse.authId &&
+            user.authProvider == userResponse.authProvider &&
+            user.name == userResponse.name &&
+            user.nickname == userResponse.nickname &&
+            user.gender == userResponse.gender &&
+            user.birthday == userResponse.birthday &&
+            user.phoneNumber == userResponse.phoneNumber &&
+            user.profileImage == userResponse.profileImage &&
+            user.countryCode == userResponse.countryCode &&
+            user.languageCode == userResponse.languageCode &&
+            user.type == userResponse.type &&
+            user.status == userResponse.status &&
+            user.createTime == userResponse.createTime &&
+            user.updateTime == userResponse.updateTime
     }
 }

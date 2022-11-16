@@ -1,48 +1,37 @@
 package com.housetainer.application.auth
 
-import com.housetainer.domain.entity.auth.AuthProvider
 import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.entity.user.UserStatus
 import com.housetainer.domain.entity.user.UserType
-import com.housetainer.domain.model.auth.SignInRequest
+import com.housetainer.domain.model.auth.InternalIssueTokenRequest
+import com.housetainer.domain.model.auth.InternalSignUpResult
+import com.housetainer.domain.model.auth.RenewTokenRequest
 import com.housetainer.domain.model.auth.SignUpRequest
-import com.housetainer.domain.model.auth.UserProfileResponse
-import com.housetainer.domain.model.device.UpsertDeviceRequest
 import com.housetainer.domain.model.user.CreateUserRequest
-import com.housetainer.domain.persistence.auth.GetUserProfileFromNaverQuery
+import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.persistence.user.GetUserByEmailQuery
+import com.housetainer.domain.persistence.user.GetUserByIdQuery
+import com.housetainer.domain.port.token.TokenService
 import com.housetainer.domain.usecase.auth.SignUseCase
-import com.housetainer.domain.usecase.device.UpsertDeviceUseCase
 import com.housetainer.domain.usecase.user.CreateUserUseCase
+import java.time.Duration
 
 class SignService(
-    private val getUserProfileFromNaverQuery: GetUserProfileFromNaverQuery,
+    private val getUserByIdQuery: GetUserByIdQuery,
     private val getUserByEmailQuery: GetUserByEmailQuery,
     private val createUserUseCase: CreateUserUseCase,
-    private val upsertDeviceUseCase: UpsertDeviceUseCase
+    tokenSecretKey: String,
+    tokenTimeout: Duration
 ) : SignUseCase {
 
-    override suspend fun signUp(signUpRequest: SignUpRequest): User {
-        val userProfile = getUserProfile(signUpRequest.accessToken, signUpRequest.authProvider)
+    private val tokenService = TokenService.getInstance(tokenSecretKey, tokenTimeout)
 
-        if (userProfile.authId != signUpRequest.authId) {
-            throw userUnauthorizedException()
-        }
+    override suspend fun signUp(signUpRequest: SignUpRequest): InternalSignUpResult {
+        val user = (getUserByEmailQuery.getUserByEmail(signUpRequest.email) ?: createUser(signUpRequest))
+        val token = tokenService.issueToken(user.toIssueTokenRequest())
 
-        return (getUserByEmailQuery.getUserByEmail(signUpRequest.email) ?: createUser(signUpRequest))
-            .apply {
-                upsertDeviceUseCase.upsertDevice(
-                    UpsertDeviceRequest(
-                        signUpRequest.deviceId,
-                        this.userId,
-                        signUpRequest.platform,
-                        signUpRequest.platformVersion,
-                        signUpRequest.appVersion,
-                        signUpRequest.locale
-                    )
-                )
-            }
+        return InternalSignUpResult(user.toUserResponse(), token)
     }
 
     private suspend fun createUser(signUpRequest: SignUpRequest): User {
@@ -68,28 +57,56 @@ class SignService(
         )
     }
 
-    override suspend fun signIn(signInRequest: SignInRequest): User {
-        val userProfile = getUserProfile(signInRequest.accessToken, signInRequest.authProvider)
-        val user = getUserByEmailQuery.getUserByEmail(userProfile.email)
-        if (user == null) {
-            throw userNotFoundException()
-        } else {
-            return user
-        }
+    override suspend fun signIn(token: String): UserResponse {
+        val tokenInformation = tokenService.validateToken(token)
+
+        return getUserByIdQuery.getUserById(tokenInformation.userId)
+            ?.toUserResponse()
+            ?: throw userNotFoundException()
     }
 
-    private suspend fun getUserProfile(accessToken: String, authProvider: AuthProvider): UserProfileResponse {
-        return when (authProvider) {
-            AuthProvider.NAVER -> getUserProfileFromNaverQuery.getUserProfile(accessToken)
-            else -> TODO()
-        }
+    override suspend fun renewToken(renewTokenRequest: RenewTokenRequest): String {
+        val user: User = (
+            if (renewTokenRequest.userId != null) {
+                getUserByIdQuery.getUserById(renewTokenRequest.userId!!)
+            } else if (renewTokenRequest.email != null) {
+                getUserByEmailQuery.getUserByEmail(renewTokenRequest.email!!)
+            } else {
+                throw userIdOrEmailRequiredException()
+            }
+            ) ?: throw userNotFoundException()
+
+        return tokenService.issueToken(user.toIssueTokenRequest())
     }
+
+    private fun User.toIssueTokenRequest() = InternalIssueTokenRequest(
+        userId, authId, authProvider
+    )
+
+    private fun User.toUserResponse() = UserResponse(
+        userId = this.userId,
+        email = this.email,
+        authId = this.authId,
+        authProvider = this.authProvider,
+        name = this.name,
+        nickname = this.nickname,
+        gender = this.gender,
+        birthday = this.birthday,
+        phoneNumber = this.phoneNumber,
+        profileImage = this.profileImage,
+        countryCode = this.countryCode,
+        languageCode = this.languageCode,
+        type = this.type,
+        status = this.status,
+        createTime = this.createTime,
+        updateTime = this.updateTime
+    )
 
     companion object {
         @JvmStatic
-        fun userUnauthorizedException() = BaseException(401, "user unauthorized")
+        fun userNotFoundException() = BaseException(404, "user not found")
 
         @JvmStatic
-        fun userNotFoundException() = BaseException(404, "user not found")
+        fun userIdOrEmailRequiredException() = BaseException(400, "userId or email is required")
     }
 }

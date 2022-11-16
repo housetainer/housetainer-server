@@ -29,7 +29,13 @@ object CommonUtils {
     val randomUuid: String
         get() = UUID.randomUUID().toString()
 
-    fun bearerToken(token: String) = "${Constants.BEARER} $token"
+    fun Throwable.extractCausedBy(len: Int = 4): String {
+        val cause = this.cause ?: this
+        val stacktraces = cause.stackTrace.toList().subList(0, Integer.min(len, cause.stackTrace.size))
+        return "$cause\n\t${stacktraces.joinToString("\n\t")}\n\t..."
+    }
+
+    fun bearerToken(token: String) = "${Constants.BEARER_PREFIX}$token"
 
     inline fun <T> T.applyWhen(predicate: Boolean, block: T.() -> Unit): T {
         if (predicate) {

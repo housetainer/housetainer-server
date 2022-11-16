@@ -9,4 +9,7 @@ object HandlerExceptions {
 
     @JvmStatic
     fun emptyBodyException() = HttpStatus.BAD_REQUEST.exception("Body should not be empty")
+
+    @JvmStatic
+    fun queryNotValidTypeException() = HttpStatus.BAD_REQUEST.exception("Query parameter type is not valid.")
 }
