@@ -10,5 +10,5 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,N
 -- -----------------------------------------------------
 -- Schema housetainer
 -- -----------------------------------------------------
-CREATE SCHEMA IF NOT EXISTS `housetainer_beta` DEFAULT CHARACTER SET utf8 ;
-USE `housetainer_beta` ;
+CREATE SCHEMA IF NOT EXISTS `housetainer_dev` DEFAULT CHARACTER SET utf8 ;
+USE `housetainer_dev` ;

@@ -35,8 +35,9 @@ jobs:
         shell: bash
         run: |
           mkdir deploy
-          cp appspec-beta.yml deploy/appspec.yml
-          cp deploy-beta.sh deploy/deploy.sh
+          cp config/appspec-dev.yml deploy/appspec.yml
+          cp config/deploy-dev.sh deploy/deploy.sh
+          cp config/logback-dev.xml deploy/logback.xml
           cp housetainer-web/build/libs/housetainer-web-*.jar deploy/
           cd deploy
           zip -qq -r ./$GITHUB_SHA.zip .
@@ -56,5 +57,5 @@ jobs:
       - name: Code Deploy #4
         run: aws deploy create-deployment --application-name housetainer
           --deployment-config-name CodeDeployDefault.OneAtATime
-          --deployment-group-name beta
+          --deployment-group-name dev
           --s3-location bucket=housetainer,bundleType=zip,key=housetainer-jar/$GITHUB_SHA.zip

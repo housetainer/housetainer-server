@@ -23,6 +23,11 @@ spring:
     password: Admin123
     locations: classpath:db/migration
 
+auth:
+  userToken:
+    secretKey: PLACEHOLDER
+    timeout: 7d
+
 webClient:
   defaultProperties:
     connectionTimeout: 6000
@@ -40,5 +45,9 @@ logging:
     org.springframework.r2dbc.core: debug
 
 springdoc:
+  api-docs:
+    enabled: false
+
   swagger-ui:
+    url: /swagger.yaml
     path: /housetainer-swagger.html

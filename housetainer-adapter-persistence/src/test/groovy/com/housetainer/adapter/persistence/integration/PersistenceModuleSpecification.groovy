@@ -1,7 +1,5 @@
 package com.housetainer.adapter.persistence.integration
 
-import com.housetainer.adapter.persistence.http.webclient.factory.WebClientFactory
-import com.housetainer.adapter.persistence.webclient.client.NaverClient
 import com.housetainer.common.wiremock.WireMockBaseSpecification
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -12,10 +10,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 
 import java.time.Duration
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = [
-    WebClientFactory,
-    NaverClient
-])
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnableAutoConfiguration
 @ContextConfiguration(initializers = PersistenceModuleContext.class)
 class PersistenceModuleSpecification extends WireMockBaseSpecification {

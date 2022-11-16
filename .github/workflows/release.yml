@@ -42,8 +42,9 @@ jobs:
         shell: bash
         run: |
           mkdir deploy
-          cp appspec.yml deploy/appspec.yml
-          cp deploy.sh deploy/deploy.sh
+          cp config/appspec.yml deploy/appspec.yml
+          cp config/deploy.sh deploy/deploy.sh
+          cp config/logback-prod.xml deploy/logback.xml
           cp housetainer-web/build/libs/housetainer-web-*.jar deploy/
           cd deploy
           zip -qq -r ./$GITHUB_SHA.zip .
