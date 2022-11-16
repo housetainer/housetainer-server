@@ -66,3 +66,14 @@ jobs:
           --deployment-config-name CodeDeployDefault.OneAtATime
           --deployment-group-name production
           --s3-location bucket=housetainer,bundleType=zip,key=housetainer-jar/$GITHUB_SHA.zip
+
+      - uses: actions/checkout@v3
+        with:
+          ref: master
+          path: master
+      - name: Merge to master
+        run: |
+          cd master
+          git fetch origin release
+          git merge origin/release
+          git push origin master

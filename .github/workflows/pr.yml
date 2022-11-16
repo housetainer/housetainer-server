@@ -7,6 +7,16 @@ on:
 jobs:
   pr_check:
     runs-on: ubuntu-latest
+    services:
+      db-master:
+        image: mysql:8.0.28
+        ports:
+          - 3856:3306
+        env:
+          MYSQL_DATABASE: "housetainer"
+          MYSQL_USER: "admin"
+          MYSQL_PASSWORD: "Admin123"
+          MYSQL_ROOT_PASSWORD: "Admin123"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
@@ -16,6 +26,13 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+      - name: Unzip sql files
+        env:
+          ZIP_PASSWORD: ${{ secrets.AWS_ACCESS_KEY }}
+        run: |
+          cd database/migration
+          7z x sql.7z -p"$ZIP_PASSWORD"
+          ls
       - run: pip install requests
       - name: Check lint
         run: |
@@ -28,7 +45,7 @@ jobs:
       #          html-detekt-report-path: build/reports/detekt/detekt.html
       - name: Test
         run: |
-          ./gradlew check -x housetainer-adapter-persistence:check -x housetainer-web:check --parallel
+          ./gradlew check -x housetainer-web:check -x housetainer-web:check --parallel
 #      - uses: pooi/coverage-comment@main
 #        with:
 #          github-token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
