@@ -18,6 +18,7 @@ spring:
     url: jdbc:mysql://localhost:3856/housetainer?serverTimezone=UTC&characterEncoding=UTF-8
     user: admin
     password: Admin123
+    locations: filesystem:../database/migration
 
 webClient:
   defaultProperties:

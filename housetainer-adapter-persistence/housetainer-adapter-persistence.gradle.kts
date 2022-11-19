@@ -39,6 +39,7 @@ dependencies {
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.flywaydb:flyway-mysql:$flywayVersion")
 }
 
 tasks.getByName<Jar>("bootJar") {
