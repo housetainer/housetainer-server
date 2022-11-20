@@ -28,7 +28,7 @@ jobs:
           python-version: '3.10'
       - name: Unzip sql files
         env:
-          ZIP_PASSWORD: ${{ secrets.AWS_ACCESS_KEY }}
+          ZIP_PASSWORD: ${{ secrets.SQL_ZIP_PASSWORD }}
         run: |
           cd database/migration
           7z x sql.7z -p"$ZIP_PASSWORD"
