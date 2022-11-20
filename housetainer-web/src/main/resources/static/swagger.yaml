@@ -11,6 +11,8 @@ servers:
 tags:
   - name: sign
     description: User Sign Up or In
+  - name: users
+    description: User management API
 
 security:
   - bearerAuth: [ ]
@@ -103,6 +105,40 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /users:
+    patch:
+      tags:
+        - users
+      summary: Update a user
+      description: User update
+      operationId: updateUser
+      security:
+        - bearerAuth: [ "*" ]
+      requestBody:
+        description: Update user request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
 components:
   schemas:
     AuthProvider:
@@ -178,6 +214,33 @@ components:
               type: integer
               format: int64
               description: update time (ms)
+
+    UpdateUserRequest:
+      type: object
+      required:
+        - userId
+      description: user update request
+      properties:
+        userId:
+          type: string
+        nickname:
+          type: string
+        gender:
+          type: string
+        birthday:
+          type: string
+        phoneNumber:
+          type: string
+        profileImage:
+          type: string
+        countryCode:
+          type: string
+        languageCode:
+          type: string
+        type:
+          $ref: '#/components/schemas/UserType'
+        status:
+          $ref: '#/components/schemas/UserStatus'
 
     RenewTokenRequest:
       type: object
@@ -262,3 +325,15 @@ components:
                 requestId: ff20bb17-7947-4161-ba78-f49a9c80868b
                 code: 404
                 message: NotFound
+    Conflict:
+      description: Conflict error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            objectExample:
+              value:
+                requestId: ff20bb17-7947-4161-ba78-f49a9c80868b
+                code: 409
+                message: Conflict

@@ -1,8 +1,13 @@
 package com.housetainer.adapter.web.integration
 
 import com.housetainer.common.BaseSpecification
+import com.housetainer.domain.entity.auth.AuthProvider
 import com.housetainer.domain.entity.exception.BaseException
+import com.housetainer.domain.entity.user.UserStatus
+import com.housetainer.domain.entity.user.UserType
+import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.usecase.auth.SignUseCase
+import com.housetainer.domain.usecase.user.UpdateUserUseCase
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
@@ -21,6 +26,8 @@ class WebAdapterSpecification extends BaseSpecification {
     @SpringBean
     SignUseCase signUseCase = Mock()
 
+    @SpringBean
+    UpdateUserUseCase updateUserUseCase = Mock()
 
     static <T> T extractBody(WebTestClient.ResponseSpec results, Class<T> clazz) {
         results.expectBody(clazz).returnResult().responseBody
@@ -33,5 +40,26 @@ class WebAdapterSpecification extends BaseSpecification {
         def exception = results.expectBody(BaseException).returnResult().responseBody
         assert exception.code == expectedException.code
         assert exception.message == expectedException.message
+    }
+
+    def createUserResponse(String userId = uuid) {
+        new UserResponse(
+            userId,
+            "test@test.com",
+            uuid,
+            AuthProvider.NAVER,
+            "name",
+            "nickname",
+            "M",
+            "2020-01-01",
+            "phoneNumber",
+            "profileImage",
+            "countryCode",
+            "languageCode",
+            UserType.MEMBER,
+            UserStatus.ACTIVE,
+            System.currentTimeMillis(),
+            System.currentTimeMillis()
+        )
     }
 }
