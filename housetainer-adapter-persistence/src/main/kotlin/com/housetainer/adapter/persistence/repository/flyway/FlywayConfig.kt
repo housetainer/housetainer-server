@@ -20,7 +20,10 @@ class FlywayConfig(private val environment: Environment) {
                     environment.getRequiredProperty("spring.flyway.user"),
                     environment.getRequiredProperty("spring.flyway.password")
                 )
-                .locations(environment.getRequiredProperty("spring.flyway.locations"))
+                .locations(locations())
         )
     }
+
+    fun locations(): String = System.getProperty("housetainer.flyway.locations")
+        ?: environment.getRequiredProperty("spring.flyway.locations")
 }

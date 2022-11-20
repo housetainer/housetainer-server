@@ -2,6 +2,7 @@ package com.housetainer.adapter.persistence.integration.repository
 
 
 import com.housetainer.adapter.persistence.exception.PersistenceExceptions
+import com.housetainer.adapter.persistence.integration.PersistenceModuleSpecification
 import com.housetainer.adapter.persistence.repository.DeviceRepository
 import com.housetainer.adapter.persistence.repository.UserRepository
 import com.housetainer.common.CoroutineTestUtils
@@ -18,7 +19,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 @Stepwise
-class DeviceRepositorySpec extends RepositorySpecification {
+class DeviceRepositorySpec extends PersistenceModuleSpecification {
 
     @Shared
     User user
