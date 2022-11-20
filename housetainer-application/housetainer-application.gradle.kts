@@ -13,6 +13,7 @@ dependencies {
 
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))
+    testImplementation(testFixtures(project(":housetainer-domain")))
 }
 
 tasks {

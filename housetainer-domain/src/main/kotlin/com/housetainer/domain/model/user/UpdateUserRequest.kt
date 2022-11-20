@@ -5,13 +5,13 @@ import com.housetainer.domain.entity.user.UserType
 
 data class UpdateUserRequest(
     val userId: String,
-    val nickname: String?,
-    val gender: String?,
-    val birthday: String?,
-    val phoneNumber: String?,
-    val profileImage: String?,
-    val countryCode: String?,
-    val languageCode: String?,
-    val type: UserType?,
-    val status: UserStatus?
+    var nickname: String? = null,
+    var gender: String? = null,
+    var birthday: String? = null,
+    var phoneNumber: String? = null,
+    var profileImage: String? = null,
+    var countryCode: String? = null,
+    var languageCode: String? = null,
+    var type: UserType? = null,
+    var status: UserStatus? = null
 )
