@@ -28,7 +28,7 @@ jobs:
       #          html-detekt-report-path: build/reports/detekt/detekt.html
       - name: Test
         run: |
-          ./gradlew check -x housetainer-adapter-persistence:check --parallel
+          ./gradlew check -x housetainer-adapter-persistence:check -x housetainer-web:check --parallel
 #      - uses: pooi/coverage-comment@main
 #        with:
 #          github-token: ${{ secrets.ACCESS_TOKEN_GITHUB }}
