@@ -77,4 +77,13 @@ tasks {
             }
         }
     }
+
+    test {
+        if (project.hasProperty("housetainer.flyway.locations")) {
+            systemProperty(
+                "housetainer.flyway.locations",
+                project.property("housetainer.flyway.locations").toString()
+            )
+        }
+    }
 }

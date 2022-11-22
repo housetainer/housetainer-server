@@ -1,5 +1,6 @@
 package com.housetainer.adapter.persistence.integration.repository
 
+import com.housetainer.adapter.persistence.integration.PersistenceModuleSpecification
 import com.housetainer.adapter.persistence.repository.UserRepository
 import com.housetainer.common.CoroutineTestUtils
 import com.housetainer.domain.entity.auth.AuthProvider
@@ -13,7 +14,7 @@ import spock.lang.Shared
 import spock.lang.Stepwise
 
 @Stepwise
-class UserRepositorySpec extends RepositorySpecification {
+class UserRepositorySpec extends PersistenceModuleSpecification {
 
     @Shared
     User user
