@@ -247,12 +247,8 @@ components:
 
     UpdateUserRequest:
       type: object
-      required:
-        - userId
       description: user update request
       properties:
-        userId:
-          type: string
         nickname:
           type: string
         gender:

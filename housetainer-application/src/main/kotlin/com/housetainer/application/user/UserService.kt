@@ -4,7 +4,7 @@ import com.housetainer.common.log.logger
 import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.model.user.CreateUserRequest
-import com.housetainer.domain.model.user.UpdateUserRequest
+import com.housetainer.domain.model.user.InternalUpdateUserRequest
 import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.model.user.UserResponse.Companion.toUserResponse
 import com.housetainer.domain.persistence.user.CreateUserCommand
@@ -31,9 +31,9 @@ class UserService(
             }
     }
 
-    override suspend fun updateUser(updateUserRequest: UpdateUserRequest): UserResponse {
+    override suspend fun updateUser(updateUserRequest: InternalUpdateUserRequest): UserResponse {
         val user = getUserByIdQuery.getUserById(updateUserRequest.userId) ?: throw userNotFoundException()
-        val newRequest = UpdateUserRequest(userId = user.userId)
+        val newRequest = InternalUpdateUserRequest(userId = user.userId)
 
         if (updateUserRequest.nickname != null && user.nickname != updateUserRequest.nickname) {
             getUserByNicknameQuery.getUserByNickname(updateUserRequest.nickname!!)

@@ -56,10 +56,10 @@ object TokenService : TokenUseCase {
 
     fun getInstance(secretKey: String, timeout: Duration): TokenService {
         synchronized(this) {
-            if (!::secretKey.isInitialized) {
+            if (!::secretKey.isInitialized || this.secretKey != secretKey) {
                 this.secretKey = secretKey
             }
-            if (!::timeout.isInitialized) {
+            if (!::timeout.isInitialized || this.timeout != timeout) {
                 this.timeout = timeout
             }
             return this

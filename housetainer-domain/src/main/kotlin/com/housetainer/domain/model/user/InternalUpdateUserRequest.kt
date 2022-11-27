@@ -3,7 +3,8 @@ package com.housetainer.domain.model.user
 import com.housetainer.domain.entity.user.UserStatus
 import com.housetainer.domain.entity.user.UserType
 
-data class UpdateUserRequest(
+data class InternalUpdateUserRequest(
+    val userId: String,
     var nickname: String? = null,
     var gender: String? = null,
     var birthday: String? = null,

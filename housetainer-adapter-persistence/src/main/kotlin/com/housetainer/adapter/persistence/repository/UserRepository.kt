@@ -5,7 +5,7 @@ import com.housetainer.adapter.persistence.repository.r2dbc.UserR2DBCRepository
 import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.model.user.CreateUserRequest
-import com.housetainer.domain.model.user.UpdateUserRequest
+import com.housetainer.domain.model.user.InternalUpdateUserRequest
 import com.housetainer.domain.persistence.user.CreateUserCommand
 import com.housetainer.domain.persistence.user.GetUserByEmailQuery
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
@@ -56,7 +56,7 @@ class UserRepository(
         return repository.findByNickname(nickname)?.toUser()
     }
 
-    override suspend fun updateUser(updateUserRequest: UpdateUserRequest): User {
+    override suspend fun updateUser(updateUserRequest: InternalUpdateUserRequest): User {
         val userEntity = repository.findByUserId(updateUserRequest.userId) ?: throw userNotFoundException()
 
         updateUserRequest.nickname?.let { userEntity.nickname = it }

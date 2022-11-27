@@ -1,6 +1,8 @@
 package com.housetainer.adapter.web.handler
 
 import com.housetainer.adapter.web.exception.HandlerExceptions
+import com.housetainer.adapter.web.router.filter.decorator.RequireUserTokenFilter
+import com.housetainer.domain.entity.auth.TokenInformation
 import com.housetainer.domain.entity.exception.BaseException
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.HttpHeaders
@@ -67,5 +69,10 @@ object HandlerExtension {
     fun ServerRequest.notEmptyPathVariable(name: String, exception: Exception? = null): String {
         return this.pathVariable(name).takeIf { it.isNotBlank() }
             ?: throw exception ?: BaseException(400, "$name is required")
+    }
+
+    fun ServerRequest.getTokenInformation(): TokenInformation {
+        return (attributes()[RequireUserTokenFilter.HEADER_TOKEN_INFORMATION] as TokenInformation?)
+            ?: throw BaseException(500)
     }
 }
