@@ -1,4 +1,4 @@
-package com.housetainer.adapter.persistence.integration
+package com.housetainer.adapter.persistence
 
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication

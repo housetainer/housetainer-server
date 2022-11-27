@@ -1,9 +1,11 @@
 plugins {
     kotlin("kapt")
+    id("java-test-fixtures")
 }
 
 dependencies {
     val jacksonVersion: String by project
+    val groovyVersion: String by project
 
     implementation(project(":housetainer-common"))
 
@@ -21,4 +23,6 @@ dependencies {
 
     // Token
     implementation("io.jsonwebtoken:jjwt:0.9.1")
+
+    testFixturesApi("org.codehaus.groovy:groovy-all:$groovyVersion")
 }

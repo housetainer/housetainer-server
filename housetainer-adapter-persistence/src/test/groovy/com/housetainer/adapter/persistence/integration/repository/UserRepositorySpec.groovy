@@ -1,18 +1,20 @@
 package com.housetainer.adapter.persistence.integration.repository
 
+import com.housetainer.adapter.persistence.integration.PersistenceModuleSpecification
 import com.housetainer.adapter.persistence.repository.UserRepository
 import com.housetainer.common.CoroutineTestUtils
 import com.housetainer.domain.entity.auth.AuthProvider
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.entity.user.UserStatus
 import com.housetainer.domain.entity.user.UserType
+import com.housetainer.domain.model.supporter.UpdateUserRequestBuilder
 import com.housetainer.domain.model.user.CreateUserRequest
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Shared
 import spock.lang.Stepwise
 
 @Stepwise
-class UserRepositorySpec extends RepositorySpecification {
+class UserRepositorySpec extends PersistenceModuleSpecification {
 
     @Shared
     User user
@@ -28,7 +30,7 @@ class UserRepositorySpec extends RepositorySpecification {
             uuid,
             AuthProvider.NAVER,
             "name",
-            "nickname",
+            "nickname-${uuid.substring(0, 5)}",
             "F",
             "2000-01-01",
             null,
@@ -91,4 +93,36 @@ class UserRepositorySpec extends RepositorySpecification {
         0 * _
     }
 
+    def "get user by nickname"() {
+        when:
+        def result = CoroutineTestUtils.executeSuspendFun {
+            userRepository.getUserByNickname(user.nickname, it)
+        } as User
+
+        then:
+        result == user
+        0 * _
+    }
+
+    def "update user"() {
+        given:
+        def request = UpdateUserRequestBuilder.create(user.userId)
+            .nickname("nickname-${uuid.substring(0, 5)}")
+            .toUpdateUserRequest()
+
+        when:
+        def result = CoroutineTestUtils.executeSuspendFun {
+            userRepository.updateUser(request, it)
+        } as User
+
+        then:
+        result.userId == user.userId
+        result.nickname != user.nickname
+        result.nickname == request.nickname
+        result.updateTime != user.updateTime
+        0 * _
+
+        cleanup:
+        user = result
+    }
 }

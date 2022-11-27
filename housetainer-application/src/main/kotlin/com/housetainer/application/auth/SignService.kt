@@ -10,6 +10,7 @@ import com.housetainer.domain.model.auth.RenewTokenRequest
 import com.housetainer.domain.model.auth.SignUpRequest
 import com.housetainer.domain.model.user.CreateUserRequest
 import com.housetainer.domain.model.user.UserResponse
+import com.housetainer.domain.model.user.UserResponse.Companion.toUserResponse
 import com.housetainer.domain.persistence.user.GetUserByEmailQuery
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
 import com.housetainer.domain.port.token.TokenService
@@ -81,25 +82,6 @@ class SignService(
 
     private fun User.toIssueTokenRequest() = InternalIssueTokenRequest(
         userId, authId, authProvider
-    )
-
-    private fun User.toUserResponse() = UserResponse(
-        userId = this.userId,
-        email = this.email,
-        authId = this.authId,
-        authProvider = this.authProvider,
-        name = this.name,
-        nickname = this.nickname,
-        gender = this.gender,
-        birthday = this.birthday,
-        phoneNumber = this.phoneNumber,
-        profileImage = this.profileImage,
-        countryCode = this.countryCode,
-        languageCode = this.languageCode,
-        type = this.type,
-        status = this.status,
-        createTime = this.createTime,
-        updateTime = this.updateTime
     )
 
     companion object {

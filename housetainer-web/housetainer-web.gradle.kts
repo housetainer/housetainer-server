@@ -46,6 +46,7 @@ dependencies {
 
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))
+    testImplementation(testFixtures(project(":housetainer-domain")))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
 }
@@ -75,6 +76,15 @@ tasks {
             bound {
                 minValue = 0  // TODO change this value to 80 when test code is ready
             }
+        }
+    }
+
+    test {
+        if (project.hasProperty("housetainer.flyway.locations")) {
+            systemProperty(
+                "housetainer.flyway.locations",
+                project.property("housetainer.flyway.locations").toString()
+            )
         }
     }
 }

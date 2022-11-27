@@ -4,8 +4,6 @@ import com.housetainer.adapter.web.exception.HandlerExceptions
 import com.housetainer.adapter.web.integration.WebAdapterSpecification
 import com.housetainer.common.utils.Constants
 import com.housetainer.domain.entity.auth.AuthProvider
-import com.housetainer.domain.entity.user.UserStatus
-import com.housetainer.domain.entity.user.UserType
 import com.housetainer.domain.model.auth.InternalSignUpResult
 import com.housetainer.domain.model.auth.RenewTokenRequest
 import com.housetainer.domain.model.auth.SignUpRequest
@@ -113,26 +111,5 @@ class SignRouterSpec extends WebAdapterSpecification {
         then:
         result.expectStatus().isBadRequest()
         0 * _
-    }
-
-    def createUserResponse(String userId = uuid) {
-        new UserResponse(
-            userId,
-            "test@test.com",
-            uuid,
-            AuthProvider.NAVER,
-            "name",
-            "nickname",
-            "M",
-            "2020-01-01",
-            "phoneNumber",
-            "profileImage",
-            "countryCode",
-            "languageCode",
-            UserType.MEMBER,
-            UserStatus.ACTIVE,
-            System.currentTimeMillis(),
-            System.currentTimeMillis()
-        )
     }
 }

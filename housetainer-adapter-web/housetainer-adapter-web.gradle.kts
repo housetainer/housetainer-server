@@ -19,6 +19,7 @@ dependencies {
 
     // Test
     testImplementation(testFixtures(project(":housetainer-common")))
+    testImplementation(testFixtures(project(":housetainer-domain")))
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
