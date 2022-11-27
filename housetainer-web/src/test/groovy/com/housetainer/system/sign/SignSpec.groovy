@@ -15,9 +15,6 @@ import spock.lang.Stepwise
 class SignSpec extends SystemSpecification {
 
     @Shared
-    Random random = new Random()
-
-    @Shared
     UserResponse user
 
     @Shared
@@ -30,7 +27,7 @@ class SignSpec extends SystemSpecification {
             uuid,
             AuthProvider.NAVER,
             "name",
-            "nickname",
+            "nickname-${uuid.substring(0, 5)}",
             "M",
             "2020-01-01",
             randomPhoneNumber(),
@@ -115,9 +112,5 @@ class SignSpec extends SystemSpecification {
         }
         verifyNoMissingStubs()
         0 * _
-    }
-
-    def randomPhoneNumber() {
-        "010-${String.format("%04d", random.nextInt(10000))}-${String.format("%04d", random.nextInt(10000))}"
     }
 }

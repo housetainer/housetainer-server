@@ -30,7 +30,7 @@ class UserRepositorySpec extends PersistenceModuleSpecification {
             uuid,
             AuthProvider.NAVER,
             "name",
-            "nickname-${uuid.substring(0, 10)}",
+            "nickname-${uuid.substring(0, 5)}",
             "F",
             "2000-01-01",
             null,
@@ -93,10 +93,21 @@ class UserRepositorySpec extends PersistenceModuleSpecification {
         0 * _
     }
 
+    def "get user by nickname"() {
+        when:
+        def result = CoroutineTestUtils.executeSuspendFun {
+            userRepository.getUserByNickname(user.nickname, it)
+        } as User
+
+        then:
+        result == user
+        0 * _
+    }
+
     def "update user"() {
         given:
         def request = UpdateUserRequestBuilder.create(user.userId)
-            .nickname("nickname-${uuid.substring(0, 10)}")
+            .nickname("nickname-${uuid.substring(0, 5)}")
             .toUpdateUserRequest()
 
         when:
