@@ -7,6 +7,7 @@ on:
 jobs:
   pr_check:
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.head_commit.message, 'action skip') }}
     services:
       db-master:
         image: bitnami/mysql:8.0.28
