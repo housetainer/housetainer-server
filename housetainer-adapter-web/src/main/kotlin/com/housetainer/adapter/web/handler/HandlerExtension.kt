@@ -29,6 +29,9 @@ object HandlerExtension {
         .bodyValue(body)
         .awaitSingle()
 
+    suspend fun accepted(): ServerResponse = ServerResponse.accepted()
+        .buildAndAwait()
+
     suspend fun noContent(headerBlock: (HttpHeaders) -> Unit = {}): ServerResponse = ServerResponse.noContent()
         .headers(headerBlock)
         .buildAndAwait()

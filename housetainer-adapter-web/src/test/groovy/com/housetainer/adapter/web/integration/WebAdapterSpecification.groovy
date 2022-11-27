@@ -7,6 +7,7 @@ import com.housetainer.domain.entity.user.UserStatus
 import com.housetainer.domain.entity.user.UserType
 import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.usecase.auth.SignUseCase
+import com.housetainer.domain.usecase.invitation.RegisterInvitationUseCase
 import com.housetainer.domain.usecase.user.UpdateUserUseCase
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,6 +29,9 @@ class WebAdapterSpecification extends BaseSpecification {
 
     @SpringBean
     UpdateUserUseCase updateUserUseCase = Mock()
+
+    @SpringBean
+    RegisterInvitationUseCase registerInvitationUseCase = Mock()
 
     static <T> T extractBody(WebTestClient.ResponseSpec results, Class<T> clazz) {
         results.expectBody(clazz).returnResult().responseBody

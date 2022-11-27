@@ -12,9 +12,11 @@ class HousetainerRouter {
     @Bean
     fun housetainerRoutes(
         signRouter: SignRouter,
-        usersRouter: UsersRouter
+        usersRouter: UsersRouter,
+        invitationRouter: InvitationRouter
     ): RouterFunction<ServerResponse> = coRouter {
         "/sign".nest(signRouter.route())
         "/users".nest(usersRouter.route())
+        "/invitation".nest(invitationRouter.route())
     }
 }
