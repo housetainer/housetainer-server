@@ -9,10 +9,12 @@ servers:
   - url: https://housetainer.tk
 
 tags:
-  - name: sign
+  - name: Sign
     description: User Sign Up or In
-  - name: users
+  - name: Users
     description: User management API
+  - name: Invitation
+    description: Invitation
 
 security:
   - bearerAuth: [ ]
@@ -21,7 +23,7 @@ paths:
   /sign/up:
     post:
       tags:
-        - sign
+        - Sign
       summary: Sign Up
       description: User sign up
       operationId: signUp
@@ -55,7 +57,7 @@ paths:
   /sign/in:
     post:
       tags:
-        - sign
+        - Sign
       summary: Sign In
       description: User sign in with **user token**
       operationId: signIn
@@ -77,7 +79,7 @@ paths:
   /sign/token/renew:
     post:
       tags:
-        - sign
+        - Sign
       summary: Re-issue token
       description: Re-issue token
       operationId: tokenRenew
@@ -108,7 +110,7 @@ paths:
   /users:
     patch:
       tags:
-        - users
+        - Users
       summary: Update a user
       description: User update
       operationId: updateUser
@@ -138,6 +140,34 @@ paths:
           $ref: '#/components/responses/NotFound'
         '409':
           $ref: '#/components/responses/Conflict'
+
+  /invitation/register:
+    post:
+      tags:
+        - Invitation
+      summary: Register invitation code
+      description: Register invitation code to login user
+      operationId: registerInvitation
+      security:
+        - bearerAuth: [ "*" ]
+      requestBody:
+        description: Register invitation request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterInvitationRequest'
+        required: true
+      responses:
+        '202':
+          description: Accepted
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
 components:
   schemas:
@@ -257,6 +287,15 @@ components:
           type: string
         authProvider:
           $ref: '#/components/schemas/AuthProvider'
+
+    RegisterInvitationRequest:
+      type: object
+      required:
+        - code
+      description: register invitation code to login user
+      properties:
+        code:
+          type: string
 
     ErrorResponse:
       type: object
