@@ -7,4 +7,6 @@ interface UserR2DBCRepository : CoroutineCrudRepository<UserEntity, Long> {
     suspend fun findByUserId(userId: String): UserEntity?
 
     suspend fun findByEmail(email: String): UserEntity?
+
+    suspend fun findByNickname(nickname: String): UserEntity?
 }

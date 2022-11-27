@@ -11,12 +11,14 @@ import com.housetainer.domain.model.user.UpdateUserRequest
 import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.persistence.user.CreateUserCommand
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
+import com.housetainer.domain.persistence.user.GetUserByNicknameQuery
 import com.housetainer.domain.persistence.user.UpdateUserCommand
 
 class UserServiceSpec extends ApplicationSpecification {
 
     CreateUserCommand createUserCommand = Mock()
     GetUserByIdQuery getUserByIdQuery = Mock()
+    GetUserByNicknameQuery getUserByNicknameQuery = Mock()
     UpdateUserCommand updateUserCommand = Mock()
 
     UserService service
@@ -25,6 +27,7 @@ class UserServiceSpec extends ApplicationSpecification {
         service = new UserService(
             createUserCommand,
             getUserByIdQuery,
+            getUserByNicknameQuery,
             updateUserCommand
         )
     }
@@ -82,11 +85,33 @@ class UserServiceSpec extends ApplicationSpecification {
         result.nickname == request.nickname
         result.type == request.type
         1 * getUserByIdQuery.getUserById(user.userId, _) >> user
+        1 * getUserByNicknameQuery.getUserByNickname(*_) >> null
         1 * updateUserCommand.updateUser({ UpdateUserRequest it ->
             it.nickname == request.nickname
             it.type == request.type
             it.gender == null
         }, _) >> updatedUser
+        0 * _
+    }
+
+    def "update user but nickname is duplicated"() {
+        given:
+        def user = createUser()
+        def newNickname = "nickname-${uuid.substring(0, 5)}"
+        def request = UpdateUserRequestBuilder.create(user.userId)
+            .nickname(newNickname)
+            .gender(user.gender)
+            .type(UserType.HOUSETAINER)
+            .toUpdateUserRequest()
+
+        when:
+        service.updateUser(request, coroutineContext)
+
+        then:
+        def exception = thrown(BaseException)
+        exception == UserService.nicknameConflictException()
+        1 * getUserByIdQuery.getUserById(user.userId, _) >> user
+        1 * getUserByNicknameQuery.getUserByNickname(newNickname, _) >> createUser()
         0 * _
     }
 

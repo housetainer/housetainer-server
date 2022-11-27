@@ -9,6 +9,7 @@ import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.model.user.UserResponse.Companion.toUserResponse
 import com.housetainer.domain.persistence.user.CreateUserCommand
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
+import com.housetainer.domain.persistence.user.GetUserByNicknameQuery
 import com.housetainer.domain.persistence.user.UpdateUserCommand
 import com.housetainer.domain.usecase.user.CreateUserUseCase
 import com.housetainer.domain.usecase.user.UpdateUserUseCase
@@ -16,6 +17,7 @@ import com.housetainer.domain.usecase.user.UpdateUserUseCase
 class UserService(
     private val createUserCommand: CreateUserCommand,
     private val getUserByIdQuery: GetUserByIdQuery,
+    private val getUserByNicknameQuery: GetUserByNicknameQuery,
     private val updateUserCommand: UpdateUserCommand
 ) : CreateUserUseCase, UpdateUserUseCase {
 
@@ -33,7 +35,12 @@ class UserService(
         val user = getUserByIdQuery.getUserById(updateUserRequest.userId) ?: throw userNotFoundException()
         val newRequest = UpdateUserRequest(userId = user.userId)
 
-        if (user.nickname != updateUserRequest.nickname) {
+        if (updateUserRequest.nickname != null && user.nickname != updateUserRequest.nickname) {
+            getUserByNicknameQuery.getUserByNickname(updateUserRequest.nickname!!)
+                ?.run {
+                    log.info("nickname-duplicate, userId={}", updateUserRequest.userId)
+                    throw nicknameConflictException()
+                }
             newRequest.nickname = updateUserRequest.nickname
         }
         if (user.gender != updateUserRequest.gender) {
@@ -83,5 +90,8 @@ class UserService(
     companion object {
         @JvmStatic
         fun userNotFoundException() = BaseException(404, "user not found")
+
+        @JvmStatic
+        fun nicknameConflictException() = BaseException(409, "nickname is duplicated")
     }
 }

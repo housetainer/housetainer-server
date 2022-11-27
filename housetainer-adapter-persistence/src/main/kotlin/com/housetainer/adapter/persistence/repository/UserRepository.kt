@@ -9,6 +9,7 @@ import com.housetainer.domain.model.user.UpdateUserRequest
 import com.housetainer.domain.persistence.user.CreateUserCommand
 import com.housetainer.domain.persistence.user.GetUserByEmailQuery
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
+import com.housetainer.domain.persistence.user.GetUserByNicknameQuery
 import com.housetainer.domain.persistence.user.UpdateUserCommand
 import org.springframework.stereotype.Component
 
@@ -18,6 +19,7 @@ class UserRepository(
 ) : CreateUserCommand,
     GetUserByIdQuery,
     GetUserByEmailQuery,
+    GetUserByNicknameQuery,
     UpdateUserCommand {
 
     override suspend fun createUser(createUserRequest: CreateUserRequest): User {
@@ -48,6 +50,10 @@ class UserRepository(
 
     override suspend fun getUserByEmail(email: String): User? {
         return repository.findByEmail(email)?.toUser()
+    }
+
+    override suspend fun getUserByNickname(nickname: String): User? {
+        return repository.findByNickname(nickname)?.toUser()
     }
 
     override suspend fun updateUser(updateUserRequest: UpdateUserRequest): User {
