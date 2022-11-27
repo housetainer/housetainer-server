@@ -38,14 +38,23 @@ jobs:
           body: ${{ steps.new_version.outputs.changelog }}
           generateReleaseNotes: true
 
+      - name: Unzip sql files
+        env:
+          ZIP_PASSWORD: ${{ secrets.SQL_ZIP_PASSWORD }}
+        run: |
+          cd database/migration
+          7z x sql.7z -p"$ZIP_PASSWORD"
+          ls
       - name: Make zip file
         shell: bash
         run: |
           mkdir deploy
+          mkdir deploy/database
           cp config/appspec.yml deploy/appspec.yml
           cp config/deploy.sh deploy/deploy.sh
           cp config/logback-prod.xml deploy/logback.xml
           cp housetainer-web/build/libs/housetainer-web-*.jar deploy/
+          cp database/migration/*.sql deploy/database/
           cd deploy
           zip -qq -r ./$GITHUB_SHA.zip .
           mv ./$GITHUB_SHA.zip ../
