@@ -1,5 +1,6 @@
 package com.housetainer.application.auth
 
+import com.housetainer.domain.entity.auth.TokenInformation
 import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.entity.user.User
 import com.housetainer.domain.entity.user.UserStatus
@@ -58,9 +59,7 @@ class SignService(
         )
     }
 
-    override suspend fun signIn(token: String): UserResponse {
-        val tokenInformation = tokenService.validateToken(token)
-
+    override suspend fun signIn(tokenInformation: TokenInformation): UserResponse {
         return getUserByIdQuery.getUserById(tokenInformation.userId)
             ?.toUserResponse()
             ?: throw userNotFoundException()

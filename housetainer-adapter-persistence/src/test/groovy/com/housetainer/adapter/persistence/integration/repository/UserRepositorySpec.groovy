@@ -108,7 +108,7 @@ class UserRepositorySpec extends PersistenceModuleSpecification {
         given:
         def request = UpdateUserRequestBuilder.create(user.userId)
             .nickname("nickname-${uuid.substring(0, 5)}")
-            .toUpdateUserRequest()
+            .toInternalUpdateUserRequest()
 
         when:
         def result = CoroutineTestUtils.executeSuspendFun {

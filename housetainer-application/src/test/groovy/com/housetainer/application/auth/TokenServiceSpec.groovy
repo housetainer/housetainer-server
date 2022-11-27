@@ -12,14 +12,13 @@ import java.time.Duration
 class TokenServiceSpec extends ApplicationSpecification {
 
     @Shared
-    String secretKey = uuid
+    Duration specTimeout = Duration.ofSeconds(3L)
 
-    @Shared
-    Duration timeout = Duration.ofSeconds(3)
+    def setupSpec() {
+        tokenService = TokenService.INSTANCE.getInstance(secretKey, specTimeout)
+    }
 
-    TokenService tokenService
-
-    def setup() {
+    def cleanupSpec() {
         tokenService = TokenService.INSTANCE.getInstance(secretKey, timeout)
     }
 
@@ -63,7 +62,7 @@ class TokenServiceSpec extends ApplicationSpecification {
         0 * _
 
         when:
-        sleep(timeout.toMillis() + 100)
+        sleep(specTimeout.toMillis() + 100)
         tokenService.validateToken(token)
 
         then:

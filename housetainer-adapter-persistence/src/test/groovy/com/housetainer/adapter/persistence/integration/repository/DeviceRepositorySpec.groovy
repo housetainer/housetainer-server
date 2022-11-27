@@ -123,7 +123,7 @@ class DeviceRepositorySpec extends PersistenceModuleSpecification {
             uuid,
             AuthProvider.NAVER,
             "name",
-            "nickname",
+            "nickname-${uuid.substring(0, 5)}",
             "F",
             "2000-01-01",
             null,

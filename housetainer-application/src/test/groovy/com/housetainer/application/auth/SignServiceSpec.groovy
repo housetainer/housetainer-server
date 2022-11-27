@@ -14,20 +14,10 @@ import com.housetainer.domain.model.user.CreateUserRequest
 import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.persistence.user.GetUserByEmailQuery
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
-import com.housetainer.domain.port.token.TokenService
 import com.housetainer.domain.usecase.user.CreateUserUseCase
-import spock.lang.Shared
 import spock.lang.Unroll
 
-import java.time.Duration
-
 class SignServiceSpec extends ApplicationSpecification {
-
-    @Shared
-    String secretKey = uuid
-
-    @Shared
-    Duration timeout = Duration.ofSeconds(3)
 
     GetUserByIdQuery getUserByIdQuery = Mock()
     GetUserByEmailQuery getUserByEmailQuery = Mock()
@@ -145,7 +135,7 @@ class SignServiceSpec extends ApplicationSpecification {
         given:
         def authId = uuid
         def userId = uuid
-        def token = TokenService.INSTANCE.issueToken(new InternalIssueTokenRequest(
+        def token = tokenService.issueToken(new InternalIssueTokenRequest(
             userId, authId, AuthProvider.NAVER
         ))
         def user = new User(
@@ -168,7 +158,13 @@ class SignServiceSpec extends ApplicationSpecification {
         )
 
         when:
-        def result = sut.signIn(token, coroutineContext) as UserResponse
+        def tokenInformation = tokenService.validateToken(token)
+
+        then:
+        tokenInformation != null
+
+        when:
+        def result = sut.signIn(tokenInformation, coroutineContext) as UserResponse
 
         then:
         compareUser(user, result)
@@ -180,12 +176,18 @@ class SignServiceSpec extends ApplicationSpecification {
         given:
         def userId = uuid
         def authId = uuid
-        def token = TokenService.INSTANCE.issueToken(new InternalIssueTokenRequest(
+        def token = tokenService.issueToken(new InternalIssueTokenRequest(
             userId, authId, AuthProvider.NAVER
         ))
 
         when:
-        sut.signIn(token, coroutineContext)
+        def tokenInformation = tokenService.validateToken(token)
+
+        then:
+        tokenInformation != null
+
+        when:
+        sut.signIn(tokenInformation, coroutineContext)
 
         then:
         def exception = thrown(BaseException)

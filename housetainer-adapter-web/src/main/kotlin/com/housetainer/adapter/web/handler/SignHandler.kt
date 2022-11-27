@@ -1,12 +1,11 @@
 package com.housetainer.adapter.web.handler
 
 import com.housetainer.adapter.web.handler.HandlerExtension.awaitBodyOrEmptyBodyException
+import com.housetainer.adapter.web.handler.HandlerExtension.getTokenInformation
 import com.housetainer.adapter.web.handler.HandlerExtension.noContent
 import com.housetainer.adapter.web.handler.HandlerExtension.ok
-import com.housetainer.adapter.web.util.RequestAttributeUtils.getAuthorizationToken
 import com.housetainer.common.log.logger
 import com.housetainer.common.utils.Constants
-import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.model.auth.RenewTokenRequest
 import com.housetainer.domain.model.auth.SignUpRequest
 import com.housetainer.domain.usecase.auth.SignUseCase
@@ -32,8 +31,7 @@ class SignHandler(
     }
 
     suspend fun signIn(request: ServerRequest): ServerResponse {
-        val token = request.getAuthorizationToken() ?: throw BaseException(401, "token is empty")
-        val result = signUseCase.signIn(token)
+        val result = signUseCase.signIn(request.getTokenInformation())
         return ok(result)
     }
 

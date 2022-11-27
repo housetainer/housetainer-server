@@ -7,7 +7,7 @@ import com.housetainer.domain.entity.user.UserType
 import com.housetainer.domain.model.supporter.UpdateUserRequestBuilder
 import com.housetainer.domain.model.supporter.UserBuilder
 import com.housetainer.domain.model.user.CreateUserRequest
-import com.housetainer.domain.model.user.UpdateUserRequest
+import com.housetainer.domain.model.user.InternalUpdateUserRequest
 import com.housetainer.domain.model.user.UserResponse
 import com.housetainer.domain.persistence.user.CreateUserCommand
 import com.housetainer.domain.persistence.user.GetUserByIdQuery
@@ -69,7 +69,7 @@ class UserServiceSpec extends ApplicationSpecification {
             .nickname("nickname-${uuid.substring(0, 5)}")
             .gender(user.gender)
             .type(UserType.HOUSETAINER)
-            .toUpdateUserRequest()
+            .toInternalUpdateUserRequest()
         def updatedUser = UserBuilder.create(user)
             .nickname(request.nickname)
             .gender(request.gender)
@@ -86,7 +86,7 @@ class UserServiceSpec extends ApplicationSpecification {
         result.type == request.type
         1 * getUserByIdQuery.getUserById(user.userId, _) >> user
         1 * getUserByNicknameQuery.getUserByNickname(*_) >> null
-        1 * updateUserCommand.updateUser({ UpdateUserRequest it ->
+        1 * updateUserCommand.updateUser({ InternalUpdateUserRequest it ->
             it.nickname == request.nickname
             it.type == request.type
             it.gender == null
@@ -102,7 +102,7 @@ class UserServiceSpec extends ApplicationSpecification {
             .nickname(newNickname)
             .gender(user.gender)
             .type(UserType.HOUSETAINER)
-            .toUpdateUserRequest()
+            .toInternalUpdateUserRequest()
 
         when:
         service.updateUser(request, coroutineContext)
@@ -122,7 +122,7 @@ class UserServiceSpec extends ApplicationSpecification {
             .nickname(user.nickname)
             .gender(user.gender)
             .type(user.type)
-            .toUpdateUserRequest()
+            .toInternalUpdateUserRequest()
 
         when:
         def result = service.updateUser(request, coroutineContext) as UserResponse
@@ -144,7 +144,7 @@ class UserServiceSpec extends ApplicationSpecification {
             .nickname(user.nickname)
             .gender(user.gender)
             .type(user.type)
-            .toUpdateUserRequest()
+            .toInternalUpdateUserRequest()
 
         when:
         service.updateUser(request, coroutineContext)
