@@ -8,6 +8,6 @@ import org.springframework.web.reactive.function.server.CoRouterFunctionDsl
 class InvitationRouter(private val invitationHandler: InvitationHandler) {
 
     fun route(): CoRouterFunctionDsl.() -> Unit = {
-        POST("register", invitationHandler::registerInvitation)
+        POST("/{code}/approve", invitationHandler::registerInvitation)
     }
 }
