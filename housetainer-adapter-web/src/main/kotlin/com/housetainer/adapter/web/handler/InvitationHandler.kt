@@ -1,9 +1,9 @@
 package com.housetainer.adapter.web.handler
 
 import com.housetainer.adapter.web.handler.HandlerExtension.accepted
-import com.housetainer.adapter.web.handler.HandlerExtension.awaitBodyOrEmptyBodyException
+import com.housetainer.adapter.web.handler.HandlerExtension.notEmptyPathVariable
 import com.housetainer.common.log.logger
-import com.housetainer.domain.model.invitation.RegisterInvitationRequest
+import com.housetainer.domain.entity.exception.BaseException
 import com.housetainer.domain.usecase.invitation.RegisterInvitationUseCase
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -17,10 +17,10 @@ class InvitationHandler(
     private val log = logger()
 
     suspend fun registerInvitation(request: ServerRequest): ServerResponse {
-        val invitationRequest: RegisterInvitationRequest = request.awaitBodyOrEmptyBodyException()
-        log.info("register-invitation, request={}", invitationRequest)
+        val code = request.notEmptyPathVariable("code", BaseException(400, "code is required"))
+        log.info("approve-invitation, code={}", code)
 
-        registerInvitationUseCase.registerInvitation(invitationRequest)
+        registerInvitationUseCase.approveInvitation(code)
 
         return accepted()
     }

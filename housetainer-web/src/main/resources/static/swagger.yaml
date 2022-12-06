@@ -5,7 +5,7 @@ info:
   version: 1.0.0
 
 servers:
-  - url: https://beta.housetainer.tk
+  - url: https://dev.housetainer.tk
   - url: https://housetainer.tk
 
 tags:
@@ -141,22 +141,22 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
-  /invitation/register:
+  /invitation/{code}/approve:
     post:
       tags:
         - Invitation
-      summary: Register invitation code
-      description: Register invitation code to login user
-      operationId: registerInvitation
+      summary: Approve invitation
+      description: Approve invitation to login user
+      operationId: approveInvitation
       security:
         - bearerAuth: [ "*" ]
-      requestBody:
-        description: Register invitation request
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterInvitationRequest'
-        required: true
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+            description: Invitation code
       responses:
         '202':
           description: Accepted

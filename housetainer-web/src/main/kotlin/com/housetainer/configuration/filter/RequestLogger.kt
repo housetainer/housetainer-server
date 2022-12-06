@@ -29,31 +29,32 @@ object RequestLogger {
         logging(requestInfo)
     }
 
-    private fun logging(requestInfo: RequestInformation) {
-        log.info(
-            "{}|{}|{}|{}|{}|{}|{}|{}",
-            requestInfo.method,
-            requestInfo.path,
-            requestInfo.pathVariables,
-            requestInfo.queryParams,
-            requestInfo.statusCode,
-            requestInfo.duration,
-            requestInfo.throwableReason ?: "",
-            requestInfo.requestBody ?: ""
-        )
+    private fun logging(requestInfo: RequestInformation?) {
+        if (requestInfo != null) {
+            log.info(
+                "{}|{}|{}|{}|{}|{}|{}|{}",
+                requestInfo.method,
+                requestInfo.path,
+                requestInfo.pathVariables,
+                requestInfo.queryParams,
+                requestInfo.statusCode,
+                requestInfo.duration,
+                requestInfo.throwableReason ?: "",
+                requestInfo.requestBody ?: ""
+            )
+        }
     }
 
-    private fun parseRequest(request: ServerRequest?, statusCode: Int, throwable: Throwable?): RequestInformation {
+    private fun parseRequest(request: ServerRequest?, statusCode: Int, throwable: Throwable?): RequestInformation? {
         if (request == null) {
-            return RequestInformation.DEFAULT
+            return null
         }
 
         val attributes = request.attributes()
 
         val method = request.methodName()
 
-        val pathMatched = attributes[RouterFunctions.MATCHING_PATTERN_ATTRIBUTE] as PathPattern?
-            ?: return RequestInformation.DEFAULT
+        val pathMatched = attributes[RouterFunctions.MATCHING_PATTERN_ATTRIBUTE] as PathPattern? ?: return null
 
         val path = pathMatched.patternString
             .replace(OPEN_BRACKET, RequestInformation.PATH_PREFIX)
@@ -106,6 +107,5 @@ data class RequestInformation(
     companion object {
         const val PATH_PREFIX = ":"
         const val SEPARATOR = ","
-        val DEFAULT = RequestInformation("unknown", "", "", "", 0, 0)
     }
 }

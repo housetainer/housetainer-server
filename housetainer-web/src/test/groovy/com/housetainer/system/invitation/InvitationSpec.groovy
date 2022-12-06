@@ -1,20 +1,18 @@
 package com.housetainer.system.invitation
 
 
-import com.housetainer.domain.model.invitation.RegisterInvitationRequest
 import com.housetainer.system.SystemSpecification
 
 class InvitationSpec extends SystemSpecification {
 
     def "POST /invitation/register - 200"() {
         given:
-        def request = new RegisterInvitationRequest("123456")
+        def code = "123456"
 
         when:
         def result = webTestClient
             .post()
-            .uri("/invitation/register")
-            .bodyValue(request)
+            .uri("/invitation/$code/approve")
             .exchange()
 
         then:
@@ -24,13 +22,12 @@ class InvitationSpec extends SystemSpecification {
 
     def "POST /invitation/register - 403"() {
         given:
-        def request = new RegisterInvitationRequest("000000")
+        def code = "000000"
 
         when:
         def result = webTestClient
             .post()
-            .uri("/invitation/register")
-            .bodyValue(request)
+            .uri("/invitation/$code/approve")
             .exchange()
 
         then:
