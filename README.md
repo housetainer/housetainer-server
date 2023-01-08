@@ -30,6 +30,14 @@
 
 ---
 
+## How to run test
+```bash
+docker-compose up -d
+./gradlew check
+```
+
+---
+
 ## How to implement a new API
 
 1. `housetainer-model`에 request, response model(`.proto`) 추가
