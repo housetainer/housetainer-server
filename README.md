@@ -23,6 +23,13 @@
 
 ---
 
+## Deployment
+* Github Action
+* AWS Code Deploy
+* S3
+
+---
+
 ## How to implement a new API
 
 1. `housetainer-model`에 request, response model(`.proto`) 추가
